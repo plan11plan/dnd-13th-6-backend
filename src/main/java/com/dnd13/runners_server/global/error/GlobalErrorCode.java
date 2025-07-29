@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.support.error;
+package com.dnd13.runners_server.global.error;
 
 import org.springframework.http.HttpStatus;
 

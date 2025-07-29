@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.support;
+package com.dnd13.runners_server.global;
 
 import java.time.LocalDateTime;
 

@@ -1,12 +1,12 @@
-package com.dnd13.runners_server.support.response;
+package com.dnd13.runners_server.global.response;
 
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.dnd13.runners_server.support.error.ErrorCode;
-import com.dnd13.runners_server.support.error.GlobalErrorCode;
+import com.dnd13.runners_server.global.error.ErrorCode;
+import com.dnd13.runners_server.global.error.GlobalErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
