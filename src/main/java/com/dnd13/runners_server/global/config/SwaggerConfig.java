@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.global;
+package com.dnd13.runners_server.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
