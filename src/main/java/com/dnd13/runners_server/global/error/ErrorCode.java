@@ -1,11 +1,7 @@
 package com.dnd13.runners_server.global.error;
 
-import org.springframework.http.HttpStatus;
+import com.dnd13.runners_server.global.response.ResponseCode;
 
-public interface ErrorCode {
-	HttpStatus getStatus();
+public interface ErrorCode extends ResponseCode {
 
-	String getCode();
-
-	String getMessage();
 }

@@ -45,7 +45,7 @@ public class ApiResponse<T> {
 	}
 
 	public static <T> ApiResponse<T> success(T result) {
-		var code = GlobalErrorCode.SUCCESS;
+		var code = GlobalSuccessCode.SUCCESS;
 		return new ApiResponse<>(code.getStatus(), code.getCode(), code.getMessage(), result);
 	}
 
