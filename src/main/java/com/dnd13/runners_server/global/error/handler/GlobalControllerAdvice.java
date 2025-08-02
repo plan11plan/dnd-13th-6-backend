@@ -17,7 +17,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.dnd13.runners_server.global.error.GlobalErrorCode;
 import com.dnd13.runners_server.global.error.GlobalException;
-import com.dnd13.runners_server.global.response.CustomResponse;
+import com.dnd13.runners_server.global.response.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,28 +27,28 @@ public class GlobalControllerAdvice {
 
 	/** Valid 검증 실패시 오류 발생 주로 @RequestBody, @RequestPart 어노테이션에서 발생 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<CustomResponse<Void>> handleValidationException(MethodArgumentNotValidException ex) {
+	public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException ex) {
 		String errorMessage = ex.getBindingResult().getFieldErrors().stream()
 			.map(error -> error.getField() + ": " + error.getDefaultMessage())
 			.collect(Collectors.joining(", "));
 
 		log.error("Error Message : {}", errorMessage);
 
-		CustomResponse<Void> error = CustomResponse.error(GlobalErrorCode.VALID_EXCEPTION, errorMessage);
+		ApiResponse<Void> error = ApiResponse.error(GlobalErrorCode.VALID_EXCEPTION, errorMessage);
 		return ResponseEntity.status(error.getStatus()).body(error);
 	}
 
 	/** 변수 Binding시 발생하는 오류 */
 	@ExceptionHandler(BindException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ResponseEntity<CustomResponse<Void>> invalidArgumentBindResponse(BindException exception) {
+	public ResponseEntity<ApiResponse<Void>> invalidArgumentBindResponse(BindException exception) {
 		log.error(
 			"Exception : {}, 입력값 : {}",
 			exception.getBindingResult().getFieldError(),
 			exception.getBindingResult().getFieldError());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(
-				CustomResponse.error(
+				ApiResponse.error(
 					GlobalErrorCode.VALID_EXCEPTION,
 					Objects.requireNonNull(exception.getBindingResult().getFieldError())
 						.getDefaultMessage()));
@@ -57,12 +57,12 @@ public class GlobalControllerAdvice {
 	/** 지원하지 않은 HTTP method 호출 할 경우 발생 */
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-	protected ResponseEntity<CustomResponse<Void>> handleHttpRequestMethodNotSupportedException(
+	protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(
 		HttpRequestMethodNotSupportedException exception) {
 		log.error("handleHttpRequestMethodNotSupportedException", exception);
 
 		return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-			.body(CustomResponse.error(GlobalErrorCode.METHOD_NOT_ALLOWED));
+			.body(ApiResponse.error(GlobalErrorCode.METHOD_NOT_ALLOWED));
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class GlobalControllerAdvice {
 	 * @return 예외를 처리해서 반환한다.
 	 */
 	@ExceptionHandler(GlobalException.class)
-	protected ResponseEntity<CustomResponse<Void>> handleGlobalBaseException(
+	protected ResponseEntity<ApiResponse<Void>> handleGlobalBaseException(
 		final GlobalException exception) {
 		log.error(
 			"{} Exception {}: {}",
@@ -81,16 +81,16 @@ public class GlobalControllerAdvice {
 			exception.getErrorCode().getMessage());
 
 		return ResponseEntity.status(exception.getErrorCode().getStatus())
-			.body(CustomResponse.error(exception.getErrorCode(), exception.getMessage()));
+			.body(ApiResponse.error(exception.getErrorCode(), exception.getMessage()));
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	protected ResponseEntity<CustomResponse<Void>> handleAccessDeniedException(
+	protected ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(
 		AccessDeniedException exception) {
 		log.info("{}", exception.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-			.body(CustomResponse.error(GlobalErrorCode.ACCESS_DENIED));
+			.body(ApiResponse.error(GlobalErrorCode.ACCESS_DENIED));
 	}
 
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -101,11 +101,11 @@ public class GlobalControllerAdvice {
 	/** 존재하지 않는 API(URL) 요청 */
 	@ExceptionHandler(NoHandlerFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	protected ResponseEntity<CustomResponse<Void>> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+	protected ResponseEntity<ApiResponse<Void>> handleNoHandlerFoundException(NoHandlerFoundException ex) {
 		log.warn("요청 URL을 찾을 수 없습니다. method={}, uri={}", ex.getHttpMethod(), ex.getRequestURL());
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-			.body(CustomResponse.error(GlobalErrorCode.NOT_FOUND));
+			.body(ApiResponse.error(GlobalErrorCode.NOT_FOUND));
 	}
 
 	/**
@@ -116,10 +116,10 @@ public class GlobalControllerAdvice {
 	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected ResponseEntity<CustomResponse<Void>> handleException(Exception exception) {
+	protected ResponseEntity<ApiResponse<Void>> handleException(Exception exception) {
 		log.error("Exception : {}", GlobalErrorCode.OTHER.getMessage(), exception);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(CustomResponse.error(GlobalErrorCode.OTHER));
+			.body(ApiResponse.error(GlobalErrorCode.OTHER));
 	}
 
 }

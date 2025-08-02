@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 // @JsonPropertyOrder : json serialization 순서를 정의
 @JsonPropertyOrder({"status", "code", "message", "result"})
-public class CustomResponse<T> {
+public class ApiResponse<T> {
 	private final HttpStatus status;
 	private final String message;
 	private final String code;
@@ -24,7 +24,7 @@ public class CustomResponse<T> {
 
 	@Override
 	public String toString() {
-		return "CustomResponse{"
+		return "ApiResponse{"
 			+ "status="
 			+ status
 			+ ", message='"
@@ -40,33 +40,33 @@ public class CustomResponse<T> {
 
 	/* ==== 정적 팩토리 ==== */
 
-	public static <T> CustomResponse<T> ok() {
+	public static <T> ApiResponse<T> ok() {
 		return success(null);
 	}
 
-	public static <T> CustomResponse<T> success(T result) {
+	public static <T> ApiResponse<T> success(T result) {
 		var code = GlobalErrorCode.SUCCESS;
-		return new CustomResponse<>(code.getStatus(), code.getCode(), code.getMessage(), result);
+		return new ApiResponse<>(code.getStatus(), code.getCode(), code.getMessage(), result);
 	}
 
-	public static <T> ResponseEntity<CustomResponse<T>> okResponseEntity(T result) {
+	public static <T> ResponseEntity<ApiResponse<T>> okResponseEntity(T result) {
 		return ResponseEntity.ok(success(result));
 	}
 
-	public static ResponseEntity<CustomResponse<Void>> okResponseEntity() {
+	public static ResponseEntity<ApiResponse<Void>> okResponseEntity() {
 		return ResponseEntity.ok(ok());
 	}
 
-	public static CustomResponse<Void> error(ErrorCode errorCode) {
-		return new CustomResponse<>(errorCode.getStatus(), errorCode.getCode(), errorCode.getMessage(), null);
+	public static ApiResponse<Void> error(ErrorCode errorCode) {
+		return new ApiResponse<>(errorCode.getStatus(), errorCode.getCode(), errorCode.getMessage(), null);
 	}
 
-	public static CustomResponse<Void> error(ErrorCode errorCode, String overrideMessage) {
-		return new CustomResponse<>(errorCode.getStatus(), errorCode.getCode(), overrideMessage, null);
+	public static ApiResponse<Void> error(ErrorCode errorCode, String overrideMessage) {
+		return new ApiResponse<>(errorCode.getStatus(), errorCode.getCode(), overrideMessage, null);
 	}
 
 	/* ==== 생성자 ==== */
-	private CustomResponse(HttpStatus status, String code, String message, T result) {
+	private ApiResponse(HttpStatus status, String code, String message, T result) {
 		Objects.requireNonNull(status, "HttpStatus must not be null");
 		Objects.requireNonNull(code, "Code must not be null");
 		Objects.requireNonNull(message, "Message must not be null");
