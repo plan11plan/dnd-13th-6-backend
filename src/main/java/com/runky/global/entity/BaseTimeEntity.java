@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.global.entity;
+package com.runky.global.entity;
 
 import java.time.LocalDateTime;
 

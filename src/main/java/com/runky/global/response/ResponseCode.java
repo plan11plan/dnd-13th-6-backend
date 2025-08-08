@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.global.response;
+package com.runky.global.response;
 
 import org.springframework.http.HttpStatus;
 

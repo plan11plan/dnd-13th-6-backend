@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.global;
+package com.runky.global;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
