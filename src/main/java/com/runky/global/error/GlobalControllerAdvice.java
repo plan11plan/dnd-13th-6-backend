@@ -1,4 +1,4 @@
-package com.dnd13.runners_server.global.error.handler;
+package com.runky.global.error;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Objects;
@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.dnd13.runners_server.global.error.GlobalErrorCode;
-import com.dnd13.runners_server.global.error.GlobalException;
-import com.dnd13.runners_server.global.response.ApiResponse;
+import com.runky.global.response.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 

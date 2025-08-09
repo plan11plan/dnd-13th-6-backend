@@ -1,0 +1,42 @@
+language: "ko-KR"
+early_access: false
+chat:
+  auto_reply: true
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**/*.java"
+      instructions: >
+        The maximum boundary of a transaction is the Application layer.
+        The interfaces layer should call the Service layer via a Facade.
+        DTOs should be placed according to the direction of dependency flow:
+          HTTP <-> interfaces: ~Request / ~Response
+          interfaces <-> application: ~Criteria / ~Result
+          application <-> domain: ~Command / Domain, Info
+          domain <-> infrastructure: Entity, primitive, Params / Domain, View
+        Primitive types are also partially allowed to be passed instead of DTOs.
+        Methods with three or more parameters must be refactored to use a DTO; for methods with two or fewer parameters, this is optional.
+        Configuration should be defined in the global scope.
+        All variable names must clearly reflect domain terminology.
+        Maintain a single Domain Service, but allow separation when necessary.
+        The PK field name for all Entities must be consistently named 'id'.
+        Utilize Value Objects (VOs) within the domain to separate responsibilities.
+        Domain rules should be cohesive within domain objects.
+        Unit or integration tests for the domain layer are mandatory; testing for other layers is optional.
+        The use of the Builder pattern in the domain is permitted.
+        The @Entity model must explicitly define both domain integrity and database integrity.
+
+
+
+
+
+
+        

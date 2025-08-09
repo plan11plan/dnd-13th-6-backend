@@ -1,10 +1,10 @@
-package com.dnd13.runners_server;
+package com.runky;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RunnersServerApplicationTests {
+class RunkyApplicationTests {
 
 	@Test
 	void contextLoads() {
