@@ -1,0 +1,49 @@
+package com.runky.crew.infrastructure;
+
+import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewMember;
+import com.runky.crew.domain.CrewRepository;
+import com.runky.crew.domain.CrewMemberCount;
+import java.util.List;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class CrewRepositoryImpl implements CrewRepository {
+
+    private final CrewJpaRepository crewJpaRepository;
+    private final CrewMemberJpaRepository crewMemberJpaRepository;
+    private final MemberCrewCountJpaRepository memberCrewCountJpaRepository;
+
+    @Override
+    public Crew save(Crew crew) {
+        return crewJpaRepository.save(crew);
+    }
+
+    @Override
+    public Optional<Crew> findById(Long crewId) {
+        return crewJpaRepository.findById(crewId);
+    }
+
+    @Override
+    public Optional<CrewMember> findByCrewAndMember(Long crewId, Long memberId) {
+        return crewMemberJpaRepository.findByCrewIdAndMemberId(crewId, memberId);
+    }
+
+    @Override
+    public List<CrewMember> findCrewMemberOfUser(Long memberId) {
+        return crewMemberJpaRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public CrewMemberCount save(CrewMemberCount crewMemberCount) {
+        return memberCrewCountJpaRepository.save(crewMemberCount);
+    }
+
+    @Override
+    public Optional<CrewMemberCount> findCountByMemberId(Long memberId) {
+        return memberCrewCountJpaRepository.findByMemberId(memberId);
+    }
+}
