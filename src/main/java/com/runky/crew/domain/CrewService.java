@@ -2,9 +2,9 @@ package com.runky.crew.domain;
 
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
