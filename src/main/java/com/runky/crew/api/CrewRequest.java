@@ -8,4 +8,7 @@ public class CrewRequest {
             String name
     ) {
     }
+
+    private CrewRequest() {
+    }
 }

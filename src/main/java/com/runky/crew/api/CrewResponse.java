@@ -12,4 +12,7 @@ public class CrewResponse {
             return new Create(result.id(), result.name(), result.code());
         }
     }
+
+    private CrewResponse() {
+    }
 }

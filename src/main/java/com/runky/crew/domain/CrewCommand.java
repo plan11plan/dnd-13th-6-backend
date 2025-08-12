@@ -5,6 +5,8 @@ public class CrewCommand {
             Long userId,
             String name
     ) {
+    }
 
+    private CrewCommand() {
     }
 }

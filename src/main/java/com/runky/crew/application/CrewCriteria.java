@@ -14,4 +14,7 @@ public class CrewCriteria {
             );
         }
     }
+
+    private CrewCriteria() {
+    }
 }
