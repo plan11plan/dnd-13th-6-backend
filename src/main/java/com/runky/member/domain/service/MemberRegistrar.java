@@ -1,5 +1,7 @@
 package com.runky.member.domain.service;
 
+import java.util.Optional;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +10,6 @@ import com.runky.member.domain.Member;
 import com.runky.member.domain.dto.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
 import com.runky.member.domain.exception.DuplicateMemberException;
-import com.runky.member.domain.exception.MemberNotFoundException;
 import com.runky.member.domain.port.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,11 @@ public class MemberRegistrar {
 		ExternalAccount account = ExternalAccount.of(command.provider(), command.providerId());
 		String nickname = command.nickname();
 
-		if (memberRepository.existsByExternalAccountProviderAndExternalAccountProviderId(
-			account.provider(),
-			account.providerId())
-		) {
-			Member existing = memberRepository.findByExternalAccountProviderAndExternalAccountProviderId(
-				account.provider(), account.providerId()).orElseThrow(MemberNotFoundException::new);
-			return new MemberInfo.Summary(existing.getId(), existing.getRole(), existing.getNickname());
+		Optional<Member> existing = memberRepository
+			.findByExternalAccountProviderAndExternalAccountProviderId(account.provider(), account.providerId());
+		if (existing.isPresent()) {
+			Member m = existing.get();
+			return new MemberInfo.Summary(m.getId(), m.getRole(), m.getNickname());
 		}
 
 		Member member = Member.register(account, nickname);

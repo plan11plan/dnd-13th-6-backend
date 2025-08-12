@@ -1,24 +1,3 @@
-kakao:
-  client:
-    id: 10591b4c28e1de84d6fd5da8ec5c3467
-    secret: P58Ag0P2sjaW2hlhtxNJn1WD2QJqZnD6
-  redirect-url: http://localhost:8080/api/auth/login/oauth2/code/kakao
-
-
-runky:
-  security:
-    cookie:
-      domain: localhost
-      secure: true
-      http-only: true
-      same-site: none
-    jwt:
-      secretKey: testSecretKey20230327testSecretKey20230327testSecretKey20230327
-      expirationTime:
-        accessTokenMinutes: 60
-        refreshTokenHours: 24
-      refresh-token:
-        pepper: refreshSecret20250812refreshSecret20250812refreshSecret20250812
 server:
   shutdown: graceful
   tomcat:
