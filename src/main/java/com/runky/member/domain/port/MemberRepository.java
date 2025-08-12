@@ -9,6 +9,6 @@ public interface MemberRepository {
 
 	Optional<Member> findByExternalAccountProviderAndExternalAccountProviderId(String provider, String providerId);
 
-	Member saveAndFlush(Member member);
+	Member save(Member member);
 
 }

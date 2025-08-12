@@ -2,14 +2,12 @@ package com.runky.member.domain.service;
 
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.dto.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
-import com.runky.member.domain.exception.DuplicateMemberException;
 import com.runky.member.domain.port.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,15 +29,8 @@ public class MemberRegistrar {
 		}
 
 		Member member = Member.register(account, nickname);
-		try {
-			Member saved = memberRepository.saveAndFlush(member);
-			return new MemberInfo.Summary(saved.getId(), saved.getRole(), saved.getNickname());
-		} catch (DataIntegrityViolationException e) {
-			Member merged = memberRepository.findByExternalAccountProviderAndExternalAccountProviderId(
-				account.provider(), account.providerId()
-			).orElseThrow(DuplicateMemberException::new);
-			return new MemberInfo.Summary(merged.getId(), merged.getRole(), merged.getNickname());
-		}
+		Member saved = memberRepository.save(member);
+		return new MemberInfo.Summary(saved.getId(), saved.getRole(), saved.getNickname());
 
 	}
 }
