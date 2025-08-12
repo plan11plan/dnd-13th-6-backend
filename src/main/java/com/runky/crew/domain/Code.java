@@ -4,17 +4,17 @@ import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalException;
 import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class Code {
     private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9]+$");
 
     private String value;
-
-    protected Code() {
-    }
 
     public Code(String value) {
         if (value.length() != CrewConstants.CODE_LENGTH.value()) {

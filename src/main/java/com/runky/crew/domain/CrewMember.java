@@ -12,11 +12,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "crew_member")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewMember extends BaseTimeEntity {
 
     @Id
@@ -33,9 +36,6 @@ public class CrewMember extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
-
-    protected CrewMember() {
-    }
 
     private CrewMember(Long memberId, Crew crew, Role role) {
         this.memberId = memberId;

@@ -15,11 +15,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "crew")
 @Getter
+@Table(name = "crew")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseTimeEntity {
 
     @Id
@@ -46,9 +49,6 @@ public class Crew extends BaseTimeEntity {
 
     @Version
     private Long version;
-
-    protected Crew() {
-    }
 
     private Crew(Long leaderId, String name, Code code, String notice, Long memberCount) {
         this.leaderId = leaderId;

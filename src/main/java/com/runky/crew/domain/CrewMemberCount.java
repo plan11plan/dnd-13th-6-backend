@@ -9,11 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "member_crew_count")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewMemberCount {
 
     @Id
@@ -29,9 +32,6 @@ public class CrewMemberCount {
     @Version
     private Long version;
 
-    protected CrewMemberCount() {
-    }
-
     private CrewMemberCount(Long memberId, Long crewCount) {
         this.memberId = memberId;
         this.crewCount = crewCount;
@@ -42,11 +42,11 @@ public class CrewMemberCount {
     }
 
     public boolean isOver() {
-        return crewCount >= 5;
+        return crewCount >= CrewConstants.CAPACITY.value();
     }
 
     public void increment() {
-        if (crewCount >= 5) {
+        if (isOver()) {
             throw new GlobalException(CrewErrorCode.OVER_CREW_COUNT);
         }
         crewCount++;
