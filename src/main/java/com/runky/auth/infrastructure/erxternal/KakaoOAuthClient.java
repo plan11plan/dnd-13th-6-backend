@@ -6,7 +6,7 @@ import org.springframework.util.MultiValueMap;
 
 import com.runky.auth.application.port.OAuthClient;
 import com.runky.auth.config.props.KakaoProperties;
-import com.runky.auth.domain.dto.OAuthUserInfo;
+import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.auth.infrastructure.erxternal.dto.KakaoTokenResponse;
 import com.runky.auth.infrastructure.erxternal.dto.KakaoUserInfoResponse;
 

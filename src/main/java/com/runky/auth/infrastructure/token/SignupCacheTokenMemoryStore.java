@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
 import com.runky.auth.config.props.SignupTokenProperties;
-import com.runky.auth.domain.dto.OAuthUserInfo;
 import com.runky.auth.domain.port.SignupCacheTokenStore;
+import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.auth.exception.domain.SignupTokenExpiredException;
 
 import lombok.RequiredArgsConstructor;
