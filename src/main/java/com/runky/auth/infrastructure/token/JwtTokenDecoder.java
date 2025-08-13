@@ -1,0 +1,51 @@
+package com.runky.auth.infrastructure.token;
+
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.stereotype.Component;
+
+import com.runky.auth.domain.port.TokenDecoder;
+import com.runky.auth.domain.vo.DecodedToken;
+import com.runky.auth.exception.domain.ExpiredTokenException;
+import com.runky.auth.exception.domain.InvalidTokenException;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class JwtTokenDecoder implements TokenDecoder {
+
+	private final JwtSigningKeyProvider signingKeyProvider;
+
+	@Override
+	public DecodedToken decodeRefresh(String refreshToken) {
+		if (refreshToken == null || refreshToken.isBlank()) {
+			throw new InvalidTokenException();
+		}
+		try {
+			SecretKey key = signingKeyProvider.refreshKey();
+
+			Claims claims = Jwts.parser()
+				.verifyWith(key)
+				.build()
+				.parseSignedClaims(refreshToken)
+				.getPayload();
+
+			Long memberId = Long.valueOf(claims.getSubject());
+			String role = claims.get("role", String.class);
+			Date exp = claims.getExpiration();
+
+			return new DecodedToken(memberId, role, exp.toInstant());
+		} catch (ExpiredJwtException e) {
+			throw new ExpiredTokenException();
+		} catch (JwtException | IllegalArgumentException e) {
+			throw new InvalidTokenException();
+		}
+	}
+}
