@@ -1,7 +1,5 @@
 package com.runky.auth.domain;
 
-import java.time.Instant;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +8,8 @@ import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.auth.domain.port.TokenHasher;
 import com.runky.auth.domain.port.TokenIssuer;
 import com.runky.auth.domain.vo.DecodedToken;
-import com.runky.auth.domain.vo.Tokens;
-import com.runky.auth.exception.domain.ExpiredTokenException;
+import com.runky.auth.domain.vo.IssuedTokens;
 import com.runky.auth.exception.domain.TokenMismatchException;
-import com.runky.auth.exception.domain.TokenRequiredException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,55 +19,51 @@ public class AuthTokenService {
 
 	private final TokenIssuer tokenIssuer;
 	private final TokenDecoder tokenDecoder;
+	private final TokenHasher tokenHasher;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private final TokenHasher refreshTokenHasher;
 
 	@Transactional
 	public AuthInfo.TokenPair issue(Long memberId, String role) {
-		Tokens tokens = tokenIssuer.issue(memberId, role);
+		IssuedTokens issued = tokenIssuer.issue(memberId, role);
+		String rtHash = tokenHasher.hash(issued.refresh().token());
+		RefreshToken entity = RefreshToken.issue(
+			memberId,
+			rtHash,
+			issued.refresh().issuedAt(),
+			issued.refresh().expiresAt()
+		);
+		refreshTokenRepository.save(entity);
 
-		DecodedToken decoded = tokenDecoder.decodeRefresh(tokens.refreshToken());
-
-		String hash = refreshTokenHasher.hash(tokens.refreshToken());
-		refreshTokenRepository.deleteByMemberId(memberId);
-		refreshTokenRepository.save(RefreshToken.issue(memberId, hash, decoded.expiresAt()));
-
-		return new AuthInfo.TokenPair(tokens.accessToken(), tokens.refreshToken());
+		return new AuthInfo.TokenPair(issued.access().token(), issued.refresh().token());
 	}
 
 	/**
-	 * RT로 AT/RT 재발급
+	 * 다중 RT
+	 * RT는 원문 저장 금지, 해시로만 저장
+	 * 회전은 제시된 RT 1건만 해당, 다른 RT들은 영향 없음(멀티 디바이스 고려)
+	 * DB에 레코드 없으면 -> 만료 예외 발생
 	 */
 	@Transactional
-	public AuthInfo.TokenPair rotate(String refreshToken) {
-		if (refreshToken == null || refreshToken.isBlank()) {
-			throw new TokenRequiredException();
-		}
+	public AuthInfo.TokenPair rotateByRefreshToken(String refreshToken) {
 
 		DecodedToken decoded = tokenDecoder.decodeRefresh(refreshToken);
+		String providedHash = tokenHasher.hash(refreshToken);
 
-		if (decoded.expiresAt().isBefore(Instant.now())) {
-			throw new ExpiredTokenException();
-		}
+		RefreshToken current = refreshTokenRepository.findByMemberIdAndTokenHash(
+			decoded.memberId(), providedHash).orElseThrow(TokenMismatchException::new);
 
-		String providedHash = refreshTokenHasher.hash(refreshToken);
-		boolean valid = refreshTokenRepository.existsByMemberIdAndTokenHash(decoded.memberId(), providedHash);
-		if (!valid) {
-			throw new TokenMismatchException();
-		}
+		IssuedTokens reissued = tokenIssuer.issue(decoded.memberId(), decoded.role());
+		String newHash = tokenHasher.hash(reissued.refresh().token());
 
-		Tokens tokens = tokenIssuer.issue(decoded.memberId(), decoded.role());
-		DecodedToken newDecoded = tokenDecoder.decodeRefresh(tokens.refreshToken());
-		String newHash = refreshTokenHasher.hash(tokens.refreshToken());
+		current.rotateTo(newHash, reissued.refresh().issuedAt(), reissued.refresh().expiresAt());
+		refreshTokenRepository.save(current);
 
-		refreshTokenRepository.deleteByMemberId(decoded.memberId());
-		refreshTokenRepository.save(RefreshToken.issue(decoded.memberId(), newHash, newDecoded.expiresAt()));
+		return new AuthInfo.TokenPair(reissued.access().token(), reissued.refresh().token());
 
-		return new AuthInfo.TokenPair(tokens.accessToken(), tokens.refreshToken());
 	}
 
 	@Transactional
-	public void logoutByMemberId(Long memberId) {
+	public void delete(Long memberId) {
 		refreshTokenRepository.deleteByMemberId(memberId);
 	}
 }

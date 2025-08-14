@@ -1,8 +1,8 @@
 package com.runky.auth.domain.port;
 
-import com.runky.auth.domain.vo.Tokens;
+import com.runky.auth.domain.vo.IssuedTokens;
 
 public interface TokenIssuer {
-	Tokens issue(Long memberId, String memberRole);
+	IssuedTokens issue(Long memberId, String memberRole);
 
 }

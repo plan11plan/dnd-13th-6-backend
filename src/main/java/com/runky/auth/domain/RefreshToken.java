@@ -1,16 +1,13 @@
 package com.runky.auth.domain;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import com.runky.auth.exception.domain.ExpiredTokenException;
 import com.runky.auth.exception.domain.InvalidTokenException;
+import com.runky.auth.exception.domain.TokenRequiredException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,14 +21,13 @@ import lombok.NoArgsConstructor;
 @Table(
 	name = "refresh_token",
 	indexes = {
-		@Index(name = "ux_refresh_token_member_id", columnList = "member_id", unique = true),
+		@Index(name = "ux_refresh_token_member_id", columnList = "member_id"),
 		@Index(name = "ix_refresh_token_expires_at", columnList = "expires_at")
 	}
 )
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 public class RefreshToken {
 
 	@Id
@@ -44,28 +40,46 @@ public class RefreshToken {
 	@Column(name = "token_hash", nullable = false, length = 64)
 	private String tokenHash;
 
+	@Column(name = "created_at", updatable = false)
+	private Instant createdAt;
+
 	@Column(name = "expires_at", nullable = false)
 	private Instant expiresAt;
 
-	@CreatedDate
-	@Column(name = "created_at", updatable = false)
-	private LocalDateTime createdAt;
-
 	@Builder
-	private RefreshToken(Long memberId, String tokenHash, Instant expiresAt) {
-		this.memberId = memberId;
-		this.tokenHash = tokenHash;
-		this.expiresAt = expiresAt;
-	}
+	private RefreshToken(final Long memberId, final String tokenHash, final Instant createdAt,
+		final Instant expiresAt) {
 
-	public static RefreshToken issue(Long memberId, String tokenHash, Instant expiresAt) {
+		if (tokenHash == null || tokenHash.isBlank()) {
+			throw new TokenRequiredException();
+		}
+
+		if (expiresAt.isBefore(Instant.now())) {
+			throw new ExpiredTokenException();
+		}
 		if (tokenHash.length() > 64) {
 			throw new InvalidTokenException();
 		}
+
+		this.memberId = memberId;
+		this.tokenHash = tokenHash;
+		this.createdAt = createdAt;
+		this.expiresAt = expiresAt;
+	}
+
+	public static RefreshToken issue(Long memberId, String tokenHash, Instant createdAt, Instant expiresAt) {
+
 		return RefreshToken.builder()
 			.memberId(memberId)
 			.tokenHash(tokenHash)
+			.createdAt(createdAt)
 			.expiresAt(expiresAt)
 			.build();
+	}
+
+	public void rotateTo(String tokenHash, Instant createdAt, Instant expiresAt) {
+		this.tokenHash = tokenHash;
+		this.createdAt = createdAt;
+		this.expiresAt = expiresAt;
 	}
 }

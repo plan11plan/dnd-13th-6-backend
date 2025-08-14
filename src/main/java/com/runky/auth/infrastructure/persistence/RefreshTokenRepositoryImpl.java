@@ -1,6 +1,7 @@
 package com.runky.auth.infrastructure.persistence;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +27,13 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 	}
 
 	@Override
-	public boolean existsByMemberIdAndTokenHash(Long memberId, String tokenHash) {
-		return jpa.existsByMemberIdAndTokenHash(memberId, tokenHash);
-	}
-
-	@Override
 	@Transactional
 	public int deleteExpiredBefore(Instant now) {
 		return jpa.deleteByExpiresAtBefore(now);
+	}
+
+	@Override
+	public Optional<RefreshToken> findByMemberIdAndTokenHash(final Long memberId, final String tokenHash) {
+		return jpa.findByMemberIdAndTokenHash(memberId, tokenHash);
 	}
 }
