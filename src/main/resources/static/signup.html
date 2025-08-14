@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Runky | 추가정보 입력</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Arial;
+            margin: 40px;
+        }
+
+        .box {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .row {
+            margin-top: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 0;
+            cursor: pointer;
+            font-size: 16px;
+            background: black;
+            color: white;
+        }
+
+        button[disabled] {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #f6f8fa;
+            padding: 12px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        small {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>추가정보 입력</h1>
+    <p>서버가 설정한 <code>signupToken</code> 쿠키가 있어야 합니다. (HttpOnly라 JS로는 보이지 않습니다)</p>
+
+    <div class="row">
+        <label for="nickname">닉네임 *</label>
+        <input autocomplete="nickname" id="nickname" placeholder="예: 러너진수" type="text"/>
+    </div>
+
+    <div class="row">
+        <button id="submitBtn">회원가입 완료</button>
+    </div>
+
+    <div class="row">
+        <h3>서버 응답(JSON)</h3>
+        <pre id="resp">(아직 전송 전)</pre>
+    </div>
+
+    <hr class="row"/>
+    <div class="row">
+        <label>백엔드 베이스 URL</label>
+        <input id="backendBaseUrl" placeholder="예: https://localhost:8080" type="text"/>
+        <small>프론트/백엔드가 다른 도메인이면 CORS + 쿠키 설정을 반드시 맞추세요.</small>
+    </div>
+</div>
+
+<script>
+    const $ = (s) => document.querySelector(s);
+    const $resp = $("#resp"), $btn = $("#submitBtn"), $nick = $("#nickname"), $base = $("#backendBaseUrl");
+
+    function backend() {
+        const raw = ($base.value || window.location.origin).trim();
+        return raw.replace(/\/+$/, "");
+    }
+
+    async function postSignup(payload) {
+        const res = await fetch(backend() + "/api/auth/signup/complete", {
+            method: "POST",
+            credentials: "include",             // 쿠키 포함
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        let json = null;
+        try {
+            json = JSON.parse(text);
+        } catch {
+        }
+        return {ok: res.ok, status: res.status, json, text};
+    }
+
+    async function onSubmit() {
+        const nickname = $nick.value.trim();
+        if (!nickname) {
+            alert("닉네임을 입력하세요.");
+            $nick.focus();
+            return;
+        }
+
+        $btn.disabled = true;
+        $resp.textContent = "요청 중…";
+        try {
+            const r = await postSignup({nickname}); // 필요 시 필드 확장
+            $resp.textContent = r.json ? JSON.stringify(r.json, null, 2) : `HTTP ${r.status}\n\n${r.text}`;
+
+            if (r.ok) {
+                // 서버가 AT/RT 쿠키를 설정했으므로 홈으로 이동
+                setTimeout(() => window.location.replace("/"), 600);
+            } else if (r.status === 401) {
+                alert("가입 토큰이 만료되었거나 없습니다. 카카오 로그인을 다시 시도하세요.");
+            } else if (r.status === 409) {
+                alert("닉네임이 중복되었습니다. 다른 닉네임으로 시도하세요.");
+            }
+        } catch (e) {
+            $resp.textContent = "오류: " + (e?.message || e);
+        } finally {
+            $btn.disabled = false;
+        }
+    }
+
+    $("#submitBtn").addEventListener("click", onSubmit);
+</script>
+</body>
+</html>
