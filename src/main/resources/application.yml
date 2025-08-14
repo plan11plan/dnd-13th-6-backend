@@ -1,3 +1,46 @@
+kakao:
+  client-id: 10591b4c28e1de84d6fd5da8ec5c3467
+  redirect-url: http://localhost:8080/api/auth/login/oauth2/code/kakao
+
+
+runky:
+  security:
+    signup-token:
+      ttlMinutes: 10
+    jwt:
+      access:
+        secret-key: accessSecret2025accessSecret2025accessSecret2025accessSecret2025
+        expiration-minutes: 1440 # 24h
+        algorithm: HS256
+      refresh:
+        secret-key: refreshSecret2025refreshSecret2025refreshSecret2025refreshSecret2025
+        expiration-minutes: 10080 # 7d
+        algorithm: HS256
+
+    # RT 저장용 해시
+    refresh-token:
+      hash:
+        mode: HMAC
+        algorithm: HmacSHA256
+        pepper: refreshSecret20250812refreshSecret20250812refreshSecret20250812
+
+    cookie:
+      common:
+        path: "/"
+        domain: ~
+        http-only: true
+        secure: true
+        same-site: None
+      access:
+        name: "accessToken"
+        max-age-minutes: 1440
+      refresh:
+        name: "refreshToken"
+        max-age-minutes: 10080
+      signup:
+        name: "signupToken"
+        max-age-minutes: 10
+
 server:
   shutdown: graceful
   tomcat:
