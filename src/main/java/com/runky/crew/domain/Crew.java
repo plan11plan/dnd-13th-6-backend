@@ -74,7 +74,7 @@ public class Crew extends BaseTimeEntity {
 
     public CrewMember joinMember(Long memberId) {
         if (hasHistory(memberId)) {
-            CrewMember member = getMember(memberId);
+            CrewMember member = getMemberHistory(memberId);
             member.rejoin();
             incrementActiveMemberCount();
             return member;
@@ -140,9 +140,16 @@ public class Crew extends BaseTimeEntity {
                 .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
     }
 
-    public CrewMember getMember(Long memberId) {
+    public CrewMember getMemberHistory(Long memberId) {
         return this.members.stream()
                 .filter(member -> member.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+    }
+
+    public CrewMember getMember(Long memberId) {
+        return this.members.stream()
+                .filter(member -> member.getMemberId().equals(memberId) && member.isInCrew())
                 .findFirst()
                 .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
     }
