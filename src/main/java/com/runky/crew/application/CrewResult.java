@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import java.util.List;
 
 public record CrewResult(
         Long id,
@@ -19,5 +20,14 @@ public record CrewResult(
                 crew.getNotice(),
                 crew.getActiveMemberCount()
         );
+    }
+
+    public record Card(
+            Long crewId,
+            String crewName,
+            Long memberCount,
+            boolean isLeader,
+            List<String> characters
+    ) {
     }
 }

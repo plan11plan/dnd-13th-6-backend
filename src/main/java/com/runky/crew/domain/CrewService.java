@@ -3,6 +3,7 @@ package com.runky.crew.domain;
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +38,10 @@ public class CrewService {
         crewMemberCount.increment();
 
         return crew;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Crew> getCrewsOfUser(Long userId) {
+        return crewRepository.findCrewsByMemberId(userId);
     }
 }

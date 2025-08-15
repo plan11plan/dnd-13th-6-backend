@@ -9,6 +9,8 @@ public interface CrewRepository {
 
     Optional<Crew> findCrewByCode(Code code);
 
+    List<Crew> findCrewsByMemberId(Long memberId);
+
     Optional<CrewMember> findByCrewAndMember(Long crewId, Long memberId);
 
     List<CrewMember> findCrewMemberOfUser(Long memberId);

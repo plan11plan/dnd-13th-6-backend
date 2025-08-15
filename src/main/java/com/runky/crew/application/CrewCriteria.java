@@ -27,6 +27,11 @@ public class CrewCriteria {
         }
     }
 
+    public record Card(
+            Long userId
+    ) {
+    }
+
     private CrewCriteria() {
     }
 }

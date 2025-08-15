@@ -5,7 +5,9 @@ import com.runky.crew.application.CrewFacade;
 import com.runky.crew.application.CrewResult;
 import com.runky.global.response.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,5 +34,12 @@ public class CrewController implements CrewApiSpec {
                                                    @RequestHeader("X-USER-ID") Long userId) {
         CrewResult result = crewFacade.join(new CrewCriteria.Join(userId, request.code()));
         return ApiResponse.success(CrewResponse.Join.from(result));
+    }
+
+    @Override
+    @GetMapping
+    public ApiResponse<CrewResponse.Cards> getCrews(@RequestHeader("X-USER-ID") Long userId) {
+        List<CrewResult.Card> cards = crewFacade.getCrews(userId);
+        return ApiResponse.success(CrewResponse.Cards.from(cards));
     }
 }

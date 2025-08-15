@@ -23,4 +23,12 @@ public interface CrewApiSpec {
     ApiResponse<CrewResponse.Join> joinCrew(
             @Schema(name = "크루 가입 요청", description = "크루 가입에 필요한 정보") CrewRequest.Join request, Long userId
     );
+
+    @Operation(
+            summary = "크루 목록 조회",
+            description = "사용자가 속한 크루 목록을 조회합니다."
+    )
+    ApiResponse<CrewResponse.Cards> getCrews(
+            Long userId
+    );
 }
