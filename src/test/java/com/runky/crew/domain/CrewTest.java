@@ -229,6 +229,56 @@ class CrewTest {
         }
     }
 
+    @Nested
+    @DisplayName("크루 리더 위임 시,")
+    class Delegate {
+
+        @Test
+        @DisplayName("새 리더를 지정하지 않으면, HAVE_TO_DELEGATE_LEADER 예외가 발생한다.")
+        void throwHaveToDelegateLeaderException_whenNoNewLeaderSpecified() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.delegateLeader(null));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.HAVE_TO_DELEGATE_LEADER));
+        }
+
+        @Test
+        @DisplayName("새 리더는 LEADER 역할로 지정되고, Crew의 LeaderId가 변경된다.")
+        void delegateLeader() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.delegateLeader(2L);
+
+            assertThat(crew.getLeader().getMemberId()).isEqualTo(2L);
+            assertThat(crew.getLeader().getRole()).isEqualTo(CrewMember.Role.LEADER);
+            assertThat(crew.getLeaderId()).isEqualTo(2L);
+        }
+
+        @Test
+        @DisplayName("이전 리더는 MEMBER 역할로 변경된다.")
+        void previousLeaderBecomesMember() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.delegateLeader(2L);
+
+            CrewMember previousLeader = crew.getMember(1L);
+            assertThat(previousLeader.getRole()).isEqualTo(CrewMember.Role.MEMBER);
+        }
+    }
+
     @Test
     @DisplayName("크루의 리더를 조회한다.")
     void getLeader() {

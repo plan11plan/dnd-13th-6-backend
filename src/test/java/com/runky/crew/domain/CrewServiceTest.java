@@ -115,6 +115,57 @@ class CrewServiceTest {
                     .usingRecursiveComparison()
                     .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
+    }
 
+    @Nested
+    @DisplayName("크루원 탈퇴 시,")
+    class Leave {
+
+        @Test
+        @DisplayName("크루가 존재하지 않으면 NOT_FOUND_CREW 예외를 발생시킨다.")
+        void throwNotFoundCrewException_whenCrewNotFound() {
+            CrewCommand.Leave command = new CrewCommand.Leave(1L, 2L, null);
+            given(crewRepository.findById(command.crewId()))
+                    .willReturn(Optional.empty());
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.leave(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        }
+
+        @Test
+        @DisplayName("리더가 탈퇴할 경우 새로운 리더를 지정하지 않으면, HAVE_TO_DELEGATE_LEADER 예외를 발생시킨다.")
+        void throwHaveToDelegateLeaderException_whenLeaderLeavesWithoutDelegation() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("def456"));
+            crew.joinMember(2L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Leave command = new CrewCommand.Leave(crew.getId(), 1L, null);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.leave(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.HAVE_TO_DELEGATE_LEADER));
+        }
+
+        @Test
+        @DisplayName("사용자가 크루 멤버가 아니면 NOT_CREW_MEMBER 예외를 발생시킨다.")
+        void throwNotCrewMemberException_whenUserNotInCrew() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("xyz789"));
+            crew.joinMember(3L);
+            crew.leaveMember(3L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Leave command = new CrewCommand.Leave(crew.getId(), 3L, null);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.leave(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
     }
 }

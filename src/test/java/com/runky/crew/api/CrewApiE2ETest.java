@@ -1,6 +1,5 @@
 package com.runky.crew.api;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
@@ -154,6 +153,36 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().code()).isEqualTo(crew.getCode().value());
             assertThat(response.getBody().getResult().memberCount()).isEqualTo(crew.getActiveMemberCount());
             assertThat(response.getBody().getResult().notice()).isEqualTo(crew.getNotice());
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /api/crews/{crewId}/members/me")
+    class Leave {
+        final String BASE_URL = "/api/crews/{crewId}/members/me";
+
+        @Test
+        @DisplayName("크루에 속한 사용자가 크루를 탈퇴한다.")
+        void leaveCrew() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(2L));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Leave>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            CrewRequest.Leave request = new CrewRequest.Leave(null);
+            ResponseEntity<ApiResponse<CrewResponse.Leave>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(request, httpHeaders),
+                            responseType,
+                            crew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().crewId()).isEqualTo(crew.getId());
         }
     }
 }
