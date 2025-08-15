@@ -1,4 +1,4 @@
-package com.runky.auth.infrastructure.erxternal;
+package com.runky.auth.infrastructure.erternal;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
-import com.runky.auth.infrastructure.erxternal.dto.KakaoTokenResponse;
-import com.runky.auth.infrastructure.erxternal.dto.KakaoUserInfoResponse;
+import com.runky.auth.infrastructure.erternal.dto.KakaoTokenResponse;
+import com.runky.auth.infrastructure.erternal.dto.KakaoUserInfoResponse;
 
 public interface KakaoApiHttpClient {
 

@@ -1,4 +1,4 @@
-package com.runky.auth.infrastructure.erxternal;
+package com.runky.auth.infrastructure.erternal;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -7,8 +7,8 @@ import org.springframework.util.MultiValueMap;
 import com.runky.auth.application.port.OAuthClient;
 import com.runky.auth.config.props.KakaoProperties;
 import com.runky.auth.domain.vo.OAuthUserInfo;
-import com.runky.auth.infrastructure.erxternal.dto.KakaoTokenResponse;
-import com.runky.auth.infrastructure.erxternal.dto.KakaoUserInfoResponse;
+import com.runky.auth.infrastructure.erternal.dto.KakaoTokenResponse;
+import com.runky.auth.infrastructure.erternal.dto.KakaoUserInfoResponse;
 
 import lombok.RequiredArgsConstructor;
 

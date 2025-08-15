@@ -1,4 +1,4 @@
-package com.runky.auth.infrastructure.erxternal.dto;
+package com.runky.auth.infrastructure.erternal.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

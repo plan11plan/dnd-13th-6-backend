@@ -1,4 +1,4 @@
-package com.runky.auth.schedular;
+package com.runky.auth.scheduler;
 
 import java.time.Instant;
 
