@@ -1,5 +1,6 @@
 package com.runky.crew.domain;
 
+import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,21 @@ public class CrewService {
 
         Crew crew = Crew.of(command, codeGenerator.generate());
         return crewRepository.save(crew);
+    }
+
+    @Transactional
+    public Crew join(CrewCommand.Join command) {
+        Crew crew = crewRepository.findCrewByCode(new Code(command.code()))
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+
+        CrewMember crewMember = (crew.contains(command.userId())) ?
+                crew.rejoinMember(command.userId()) :
+                crew.joinMember(command.userId());
+
+        CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(command.userId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        crewMemberCount.increment();
+
+        return crew;
     }
 }

@@ -9,6 +9,12 @@ public class CrewRequest {
     ) {
     }
 
+    public record Join(
+            @NotNull(message = "크루 코드는 필수입니다.")
+            String code
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

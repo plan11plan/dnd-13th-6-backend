@@ -17,7 +17,7 @@ public record CrewResult(
                 crew.getCode().value(),
                 crew.getLeaderId(),
                 crew.getNotice(),
-                crew.getMemberCount()
+                crew.getActiveMemberCount()
         );
     }
 }

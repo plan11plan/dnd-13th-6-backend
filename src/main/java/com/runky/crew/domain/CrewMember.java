@@ -1,6 +1,8 @@
 package com.runky.crew.domain;
 
+import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.entity.BaseTimeEntity;
+import com.runky.global.error.GlobalException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,16 +49,48 @@ public class CrewMember extends BaseTimeEntity {
         return new CrewMember(crew.getLeaderId(), crew, Role.LEADER);
     }
 
+    public static CrewMember memberOf(Long memberId, Crew crew) {
+        return new CrewMember(memberId, crew, Role.MEMBER);
+    }
+
     public void join(Crew crew) {
         this.crew = crew;
+    }
+
+    public void rejoin() {
+        if (isBanned()) {
+            throw new GlobalException(CrewErrorCode.BANNED_MEMBER);
+        }
+        if (isInCrew()) {
+            throw new GlobalException(CrewErrorCode.ALREADY_IN_CREW);
+        }
+        this.role = Role.MEMBER;
+    }
+
+    public void ban() {
+        this.role = Role.BANNED;
+    }
+
+    public void leave() {
+        this.role = Role.LEFT;
     }
 
     public boolean isLeader() {
         return this.role == Role.LEADER;
     }
 
+    public boolean isBanned() {
+        return this.role == Role.BANNED;
+    }
+
+    public boolean isInCrew() {
+        return this.role == Role.LEADER || this.role == Role.MEMBER;
+    }
+
     public enum Role {
         LEADER,
-        MEMBER
+        MEMBER,
+        LEFT,
+        BANNED
     }
 }

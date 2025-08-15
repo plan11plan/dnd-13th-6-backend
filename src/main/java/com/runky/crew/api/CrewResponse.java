@@ -13,6 +13,14 @@ public class CrewResponse {
         }
     }
 
+    public record Join(
+            Long crewId
+    ) {
+        public static Join from(CrewResult result) {
+            return new Join(result.id());
+        }
+    }
+
     private CrewResponse() {
     }
 }

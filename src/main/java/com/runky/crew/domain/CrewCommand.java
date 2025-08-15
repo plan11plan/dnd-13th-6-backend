@@ -7,6 +7,12 @@ public class CrewCommand {
     ) {
     }
 
+    public record Join(
+            Long userId,
+            String code
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

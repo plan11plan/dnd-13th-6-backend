@@ -5,15 +5,17 @@ import java.util.Optional;
 
 public interface CrewRepository {
 
-    Crew save(Crew crew);
-
     Optional<Crew> findById(Long crewId);
+
+    Optional<Crew> findCrewByCode(Code code);
 
     Optional<CrewMember> findByCrewAndMember(Long crewId, Long memberId);
 
     List<CrewMember> findCrewMemberOfUser(Long memberId);
 
-    CrewMemberCount save(CrewMemberCount crewMemberCount);
-
     Optional<CrewMemberCount> findCountByMemberId(Long memberId);
+
+    Crew save(Crew crew);
+
+    CrewMemberCount save(CrewMemberCount crewMemberCount);
 }

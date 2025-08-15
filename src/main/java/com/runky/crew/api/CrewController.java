@@ -1,6 +1,5 @@
 package com.runky.crew.api;
 
-import com.runky.crew.api.CrewResponse.Create;
 import com.runky.crew.application.CrewCriteria;
 import com.runky.crew.application.CrewFacade;
 import com.runky.crew.application.CrewResult;
@@ -21,8 +20,17 @@ public class CrewController implements CrewApiSpec {
 
     @Override
     @PostMapping
-    public ApiResponse<Create> createCrew(@Valid @RequestBody CrewRequest.Create request, @RequestHeader("X-USER-ID") Long userId) {
+    public ApiResponse<CrewResponse.Create> createCrew(@Valid @RequestBody CrewRequest.Create request,
+                                                       @RequestHeader("X-USER-ID") Long userId) {
         CrewResult result = crewFacade.create(new CrewCriteria.Create(userId, request.name()));
         return ApiResponse.success(CrewResponse.Create.from(result));
+    }
+
+    @Override
+    @PostMapping("/join")
+    public ApiResponse<CrewResponse.Join> joinCrew(@Valid @RequestBody CrewRequest.Join request,
+                                                   @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.join(new CrewCriteria.Join(userId, request.code()));
+        return ApiResponse.success(CrewResponse.Join.from(result));
     }
 }

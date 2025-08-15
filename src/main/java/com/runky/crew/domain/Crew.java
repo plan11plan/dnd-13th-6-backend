@@ -2,6 +2,7 @@ package com.runky.crew.domain;
 
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.entity.BaseTimeEntity;
+import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -45,17 +46,17 @@ public class Crew extends BaseTimeEntity {
     private String notice;
 
     @Column(name = "member_count", nullable = false)
-    private Long memberCount;
+    private Long activeMemberCount;
 
     @Version
     private Long version;
 
-    private Crew(Long leaderId, String name, Code code, String notice, Long memberCount) {
+    private Crew(Long leaderId, String name, Code code, String notice, Long activeMemberCount) {
         this.leaderId = leaderId;
         this.name = name;
         this.code = code;
         this.notice = notice;
-        this.memberCount = memberCount;
+        this.activeMemberCount = activeMemberCount;
     }
 
     public static Crew of(CrewCommand.Create command, Code code) {
@@ -72,8 +73,80 @@ public class Crew extends BaseTimeEntity {
     }
 
     public void add(CrewMember crewMember) {
-        this.members.add(crewMember);
         crewMember.join(this);
-        this.memberCount++;
+        this.members.add(crewMember);
+        incrementActiveMemberCount();
+    }
+
+    public boolean contains(Long memberId) {
+        return this.members.stream()
+                .anyMatch(member -> member.getMemberId().equals(memberId));
+    }
+
+    public void incrementActiveMemberCount() {
+        if (this.activeMemberCount >= CrewConstants.CREW_CAPACITY.value()) {
+            throw new GlobalException(CrewErrorCode.OVER_CREW_MEMBER_COUNT);
+        }
+        this.activeMemberCount++;
+    }
+
+    public void decrementActiveMemberCount() {
+        this.activeMemberCount--;
+    }
+
+    public CrewMember rejoinMember(Long memberId) {
+        CrewMember crewMember = this.members.stream()
+                .filter(member -> member.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+
+        crewMember.rejoin();
+        incrementActiveMemberCount();
+        return crewMember;
+    }
+
+    public CrewMember joinMember(Long memberId) {
+        if (this.members.stream().anyMatch(member -> member.getMemberId().equals(memberId))) {
+            throw new GlobalException(CrewErrorCode.ALREADY_IN_CREW);
+        }
+        CrewMember crewMember = CrewMember.memberOf(memberId, this);
+        add(crewMember);
+        return crewMember;
+    }
+
+    public CrewMember banMember(Long memberId) {
+        CrewMember crewMember = this.members.stream()
+                .filter(member -> member.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+
+        crewMember.ban();
+        decrementActiveMemberCount();
+        return crewMember;
+    }
+
+    public CrewMember leaveMember(Long memberId) {
+        CrewMember crewMember = this.members.stream()
+                .filter(member -> member.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+
+        crewMember.leave();
+        decrementActiveMemberCount();
+        return crewMember;
+    }
+
+    public CrewMember getLeader() {
+        return this.members.stream()
+                .filter(member -> member.getRole() == CrewMember.Role.LEADER)
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+    }
+
+    public CrewMember getMember(Long memberId) {
+        return this.members.stream()
+                .filter(member -> member.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
     }
 }

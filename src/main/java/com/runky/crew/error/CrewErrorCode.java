@@ -13,6 +13,10 @@ public enum CrewErrorCode implements ErrorCode {
     BLANK_CREW_NAME(HttpStatus.BAD_REQUEST, "C102", "크루 이름은 공백일 수 없습니다."),
     OVER_CODE_LENGTH(HttpStatus.BAD_REQUEST, "C103", "코드의 길이는 6자여야 합니다."),
     INVALID_CODE_PATTERN(HttpStatus.BAD_REQUEST, "C104", "코드는 영문 대소문자와 숫자만 포함할 수 있습니다."),
+    OVER_CREW_MEMBER_COUNT(HttpStatus.CONFLICT, "C105", "크루는 최대 6명까지 참여할 수 있습니다."),
+    NOT_FOUND_CREW(HttpStatus.NOT_FOUND, "C106", "크루를 찾을 수 없습니다."),
+    BANNED_MEMBER(HttpStatus.FORBIDDEN, "C107", "추방된 멤버입니다."),
+    ALREADY_IN_CREW(HttpStatus.CONFLICT, "C108", "이미 크루에 참여한 상태입니다."),
     ;
 
     private final HttpStatus status;

@@ -1,5 +1,6 @@
 package com.runky.crew.infrastructure;
 
+import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewRepository;
@@ -25,6 +26,11 @@ public class CrewRepositoryImpl implements CrewRepository {
     @Override
     public Optional<Crew> findById(Long crewId) {
         return crewJpaRepository.findById(crewId);
+    }
+
+    @Override
+    public Optional<Crew> findCrewByCode(Code code) {
+        return crewJpaRepository.findByCode(code);
     }
 
     @Override

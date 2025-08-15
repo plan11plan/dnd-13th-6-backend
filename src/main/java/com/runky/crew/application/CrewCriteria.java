@@ -15,6 +15,18 @@ public class CrewCriteria {
         }
     }
 
+    public record Join(
+            Long userId,
+            String code
+    ) {
+        public CrewCommand.Join toCommand() {
+            return new CrewCommand.Join(
+                    userId,
+                    code
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }
