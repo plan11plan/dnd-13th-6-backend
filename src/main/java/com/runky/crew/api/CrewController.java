@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -42,4 +43,13 @@ public class CrewController implements CrewApiSpec {
         List<CrewResult.Card> cards = crewFacade.getCrews(userId);
         return ApiResponse.success(CrewResponse.Cards.from(cards));
     }
+
+    @Override
+    @GetMapping("/{crewId}")
+    public ApiResponse<CrewResponse.Detail> getCrew(@PathVariable Long crewId,
+                                                    @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Detail result = crewFacade.getCrew(new CrewCriteria.Detail(crewId, userId));
+        return ApiResponse.success(CrewResponse.Detail.from(result));
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CrewResult(
@@ -28,6 +29,17 @@ public record CrewResult(
             Long memberCount,
             boolean isLeader,
             List<String> characters
+    ) {
+    }
+
+    public record Detail(
+            Long crewId,
+            String name,
+            String leaderNickname,
+            String notice,
+            Long memberCount,
+            BigDecimal goal,
+            String code
     ) {
     }
 }

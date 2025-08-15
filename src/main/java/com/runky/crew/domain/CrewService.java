@@ -29,7 +29,7 @@ public class CrewService {
         Crew crew = crewRepository.findCrewByCode(new Code(command.code()))
                 .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
 
-        CrewMember crewMember = (crew.contains(command.userId())) ?
+        CrewMember crewMember = (crew.containsMember(command.userId())) ?
                 crew.rejoinMember(command.userId()) :
                 crew.joinMember(command.userId());
 
@@ -43,5 +43,15 @@ public class CrewService {
     @Transactional(readOnly = true)
     public List<Crew> getCrewsOfUser(Long userId) {
         return crewRepository.findCrewsByMemberId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Crew getCrew(CrewCommand.Detail command) {
+        Crew crew = crewRepository.findById(command.crewId())
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        if (!crew.containsMember(command.userId())) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_MEMBER);
+        }
+        return crew;
     }
 }

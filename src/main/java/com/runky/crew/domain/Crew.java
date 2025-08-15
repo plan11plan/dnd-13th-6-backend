@@ -78,9 +78,9 @@ public class Crew extends BaseTimeEntity {
         incrementActiveMemberCount();
     }
 
-    public boolean contains(Long memberId) {
+    public boolean containsMember(Long memberId) {
         return this.members.stream()
-                .anyMatch(member -> member.getMemberId().equals(memberId));
+                .anyMatch(member -> member.getMemberId().equals(memberId) && member.isInCrew());
     }
 
     public void incrementActiveMemberCount() {
@@ -106,7 +106,7 @@ public class Crew extends BaseTimeEntity {
     }
 
     public CrewMember joinMember(Long memberId) {
-        if (this.members.stream().anyMatch(member -> member.getMemberId().equals(memberId))) {
+        if (containsMember(memberId)) {
             throw new GlobalException(CrewErrorCode.ALREADY_IN_CREW);
         }
         CrewMember crewMember = CrewMember.memberOf(memberId, this);

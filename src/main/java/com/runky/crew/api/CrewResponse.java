@@ -1,6 +1,7 @@
 package com.runky.crew.api;
 
 import com.runky.crew.application.CrewResult;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CrewResponse {
@@ -47,6 +48,28 @@ public class CrewResponse {
                     card.memberCount(),
                     card.isLeader(),
                     card.characters()
+            );
+        }
+    }
+
+    public record Detail(
+            Long crewId,
+            String name,
+            String leaderNickname,
+            String notice,
+            Long memberCount,
+            BigDecimal goal,
+            String code
+    ) {
+        public static Detail from(CrewResult.Detail detail) {
+            return new Detail(
+                    detail.crewId(),
+                    detail.name(),
+                    detail.leaderNickname(),
+                    detail.notice(),
+                    detail.memberCount(),
+                    detail.goal(),
+                    detail.code()
             );
         }
     }

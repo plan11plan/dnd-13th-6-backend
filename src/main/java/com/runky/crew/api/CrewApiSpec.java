@@ -31,4 +31,13 @@ public interface CrewApiSpec {
     ApiResponse<CrewResponse.Cards> getCrews(
             Long userId
     );
+
+    @Operation(
+            summary = "크루 상세 조회",
+            description = "크루의 상세 정보를 조회합니다."
+    )
+    ApiResponse<CrewResponse.Detail> getCrew(
+            Long crewId,
+            Long userId
+    );
 }

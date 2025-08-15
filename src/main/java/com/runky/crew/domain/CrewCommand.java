@@ -13,6 +13,12 @@ public class CrewCommand {
     ) {
     }
 
+    public record Detail(
+            Long crewId,
+            Long userId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

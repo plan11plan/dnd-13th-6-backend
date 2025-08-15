@@ -32,6 +32,18 @@ public class CrewCriteria {
     ) {
     }
 
+    public record Detail(
+            Long crewId,
+            Long userId
+    ) {
+        public CrewCommand.Detail toCrewCommand() {
+            return new CrewCommand.Detail(
+                    crewId,
+                    userId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }
