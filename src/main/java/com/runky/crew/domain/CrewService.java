@@ -29,9 +29,7 @@ public class CrewService {
         Crew crew = crewRepository.findCrewByCode(new Code(command.code()))
                 .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
 
-        CrewMember crewMember = (crew.containsMember(command.userId())) ?
-                crew.rejoinMember(command.userId()) :
-                crew.joinMember(command.userId());
+        CrewMember crewmember = crew.joinMember(command.userId());
 
         CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(command.userId())
                 .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));

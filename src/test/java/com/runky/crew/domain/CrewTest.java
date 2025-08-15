@@ -95,62 +95,39 @@ class CrewTest {
     }
 
     @Nested
-    @DisplayName("크루원 재가입 시,")
-    class Rejoin {
+    @DisplayName("크루 가입 시,")
+    class Join {
 
         @Test
-        @DisplayName("가입하지 않았던 사용자의 재가입 요청일 경우, NOT_FOUND 예외가 발생한다.")
-        void throwNotFoundException_whenRejoiningMemberNotInCrew() {
-            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
-            Code code = new Code("ABC123");
-            Crew crew = Crew.of(command, code);
-
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.rejoinMember(2L));
-
-            assertThat(thrown)
-                    .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
-        }
-
-        @Test
-        @DisplayName("사용자가 크루에 재가입 요청할 때, 가입한 적이 없다면, NOT_FOUND 예외가 발생한다.")
-        void throwNotFoundException_whenRejoiningMemberNotFound() {
-            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
-            Code code = new Code("ABC123");
-            Crew crew = Crew.of(command, code);
-
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.rejoinMember(2L));
-
-            assertThat(thrown)
-                    .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
-        }
-
-        @Test
-        @DisplayName("크루원이 이미 꽉 차있다면, OVER_CREW_MEMBER_COUNT 예외가 발생한다.")
-        void throwOverCrewMemberCountException_whenRejoiningFullCrew() {
+        @DisplayName("가입한 기록이 있는 경우, 추방된 멤버라면, BANNED_MEMBER 예외가 발생한다.")
+        void throwBannedMemberException_whenJoiningBannedMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
             Crew crew = Crew.of(command, code);
             crew.joinMember(2L);
-            crew.joinMember(3L);
-            crew.joinMember(4L);
-            crew.joinMember(5L);
-            crew.joinMember(6L);
-            crew.leaveMember(6L);
-            crew.joinMember(7L);
+            crew.banMember(2L);
 
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.rejoinMember(6L));
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.joinMember(2L));
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(CrewErrorCode.OVER_CREW_MEMBER_COUNT));
+                    .isEqualTo(new GlobalException(CrewErrorCode.BANNED_MEMBER));
         }
-    }
 
-    @Nested
-    @DisplayName("크루 가입 시,")
-    class Join {
+        @Test
+        @DisplayName("가입한 기록이 있는 경우, 이미 가입된 멤버라면, ALREADY_IN_CREW 예외가 발생한다.")
+        void throwAlreadyInCrewException_whenJoiningAlreadyJoinedMember() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.joinMember(2L));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.ALREADY_IN_CREW));
+        }
 
         @Test
         @DisplayName("이미 가입한 크루일 경우, ALREADY_IN_CREW 예외가 발생한다.")

@@ -72,42 +72,12 @@ public class Crew extends BaseTimeEntity {
         return crew;
     }
 
-    public void add(CrewMember crewMember) {
-        crewMember.join(this);
-        this.members.add(crewMember);
-        incrementActiveMemberCount();
-    }
-
-    public boolean containsMember(Long memberId) {
-        return this.members.stream()
-                .anyMatch(member -> member.getMemberId().equals(memberId) && member.isInCrew());
-    }
-
-    public void incrementActiveMemberCount() {
-        if (this.activeMemberCount >= CrewConstants.CREW_CAPACITY.value()) {
-            throw new GlobalException(CrewErrorCode.OVER_CREW_MEMBER_COUNT);
-        }
-        this.activeMemberCount++;
-    }
-
-    public void decrementActiveMemberCount() {
-        this.activeMemberCount--;
-    }
-
-    public CrewMember rejoinMember(Long memberId) {
-        CrewMember crewMember = this.members.stream()
-                .filter(member -> member.getMemberId().equals(memberId))
-                .findFirst()
-                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
-
-        crewMember.rejoin();
-        incrementActiveMemberCount();
-        return crewMember;
-    }
-
     public CrewMember joinMember(Long memberId) {
-        if (containsMember(memberId)) {
-            throw new GlobalException(CrewErrorCode.ALREADY_IN_CREW);
+        if (hasHistory(memberId)) {
+            CrewMember member = getMember(memberId);
+            member.rejoin();
+            incrementActiveMemberCount();
+            return member;
         }
         CrewMember crewMember = CrewMember.memberOf(memberId, this);
         add(crewMember);
@@ -134,6 +104,33 @@ public class Crew extends BaseTimeEntity {
         crewMember.leave();
         decrementActiveMemberCount();
         return crewMember;
+    }
+
+    public void add(CrewMember crewMember) {
+        crewMember.join(this);
+        this.members.add(crewMember);
+        incrementActiveMemberCount();
+    }
+
+    public boolean hasHistory(Long memberId) {
+        return this.members.stream()
+                .anyMatch(member -> member.getMemberId().equals(memberId));
+    }
+
+    public boolean containsMember(Long memberId) {
+        return this.members.stream()
+                .anyMatch(member -> member.getMemberId().equals(memberId) && member.isInCrew());
+    }
+
+    public void incrementActiveMemberCount() {
+        if (this.activeMemberCount >= CrewConstants.CREW_CAPACITY.value()) {
+            throw new GlobalException(CrewErrorCode.OVER_CREW_MEMBER_COUNT);
+        }
+        this.activeMemberCount++;
+    }
+
+    public void decrementActiveMemberCount() {
+        this.activeMemberCount--;
     }
 
     public CrewMember getLeader() {

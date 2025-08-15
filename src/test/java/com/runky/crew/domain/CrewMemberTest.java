@@ -45,9 +45,9 @@ class CrewMemberTest {
         void throwBannedMemberException_whenBanned() {
             Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
             crew.joinMember(2L);
-            crew.banMember(2L);
+            CrewMember crewMember = crew.banMember(2L);
 
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.rejoinMember(2L));
+            GlobalException thrown = assertThrows(GlobalException.class, crewMember::rejoin);
 
             assertThat(thrown)
                     .usingRecursiveComparison()
@@ -58,9 +58,9 @@ class CrewMemberTest {
         @DisplayName("이미 가입된 크루라면, ALREADY_IN_CREW 예외가 발생한다.")
         void throwAlreadyInCrewException_whenAlreadyJoined() {
             Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
-            crew.joinMember(2L);
+            CrewMember crewMember = crew.joinMember(2L);
 
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.rejoinMember(2L));
+            GlobalException thrown = assertThrows(GlobalException.class, crewMember::rejoin);
 
             assertThat(thrown)
                     .usingRecursiveComparison()
