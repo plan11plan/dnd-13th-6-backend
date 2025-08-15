@@ -2,7 +2,9 @@ package com.runky.crew.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewMemberCount;
 import com.runky.crew.domain.CrewRepository;
 import com.runky.global.response.ApiResponse;
@@ -65,6 +67,33 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().crewId()).isEqualTo(crew.getId());
             assertThat(response.getBody().getResult().name()).isEqualTo(crew.getName());
             assertThat(response.getBody().getResult().code()).isEqualTo(crew.getCode().value());
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/crews/join")
+    class Join {
+        final String BASE_URL = "/api/crews/join";
+
+        @Test
+        @DisplayName("크루에 참여한다.")
+        void joinCrew() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("abc123"));
+            Crew savedCrew = crewRepository.save(crew);
+            Long userId = 2L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Join>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            CrewRequest.Join request = new CrewRequest.Join(crew.getCode().value());
+
+            ResponseEntity<ApiResponse<CrewResponse.Join>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.POST, new HttpEntity<>(request, httpHeaders),
+                            responseType);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().crewId()).isEqualTo(savedCrew.getId());
         }
     }
 }

@@ -43,4 +43,43 @@ class CrewServiceTest {
                     .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
         }
     }
+
+    @DisplayName("크루 가입 시,")
+    @Nested
+    class Join {
+
+        @Test
+        @DisplayName("탈퇴했던 크루일 경우, 재가입 처리된다.")
+        void rejoinCrew_whenAlreadyJoined() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("ABC123"));
+            crew.joinMember(2L);
+            crew.leaveMember(2L);
+            given(crewRepository.findCrewByCode(crew.getCode()))
+                    .willReturn(Optional.of(crew));
+            given(crewRepository.findCountByMemberId(2L))
+                    .willReturn(Optional.of(CrewMemberCount.of(2L)));
+            CrewCommand.Join command = new CrewCommand.Join(2L, crew.getCode().value());
+
+            Crew joinedCrew = crewService.join(command);
+
+            assertThat(joinedCrew.getMember(2L).getRole()).isEqualTo(CrewMember.Role.MEMBER);
+            assertThat(joinedCrew.getMember(2L).isInCrew()).isTrue();
+        }
+
+        @Test
+        @DisplayName("크루에 처음 가입하는 경우, 새로운 멤버로 추가된다.")
+        void joinCrew_whenFirstTimeJoining() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "New Crew"), new Code("XYZ789"));
+            given(crewRepository.findCrewByCode(crew.getCode()))
+                    .willReturn(Optional.of(crew));
+            given(crewRepository.findCountByMemberId(3L))
+                    .willReturn(Optional.of(CrewMemberCount.of(3L)));
+            CrewCommand.Join command = new CrewCommand.Join(3L, crew.getCode().value());
+
+            Crew joinedCrew = crewService.join(command);
+
+            assertThat(joinedCrew.getMember(3L).getRole()).isEqualTo(CrewMember.Role.MEMBER);
+            assertThat(joinedCrew.getMember(3L).isInCrew()).isTrue();
+        }
+    }
 }
