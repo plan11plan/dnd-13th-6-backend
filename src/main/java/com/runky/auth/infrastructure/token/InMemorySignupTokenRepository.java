@@ -2,13 +2,12 @@ package com.runky.auth.infrastructure.token;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.runky.auth.config.props.SignupTokenProperties;
-import com.runky.auth.domain.port.SignupCacheTokenStore;
+import com.runky.auth.domain.signup.SignupToken;
+import com.runky.auth.domain.signup.SignupTokenRepository;
 import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.auth.exception.domain.SignupTokenExpiredException;
 
@@ -19,19 +18,18 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
-public class SignupCacheTokenMemoryStore implements SignupCacheTokenStore {
+public class InMemorySignupTokenRepository implements SignupTokenRepository {
 
-	private final SignupTokenProperties props;
 	private final Map<String, TokenData> store = new ConcurrentHashMap<>();
 
 	@Override
-	public String issueAndSave(OAuthUserInfo info) {
-		String token = UUID.randomUUID().toString();
-		long expireAtMillis = Instant.now().plus(props.ttl()).toEpochMilli();
-		store.put(token, new TokenData(info, expireAtMillis));
-		return token;
+	public String save(final SignupToken signupToken, final OAuthUserInfo info) {
+		String id = signupToken.idValue();
+		store.put(id, new TokenData(info, signupToken.getExpiresAt().toEpochMilli()));
+		return id;
 	}
 
+	//TODO: get + remove 분리 리팩토링 필요
 	@Override
 	public OAuthUserInfo get(String token) {
 		TokenData data = store.get(token);

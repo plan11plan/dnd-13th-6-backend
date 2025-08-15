@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.runky.auth.application.port.OAuthClient;
 import com.runky.auth.domain.AuthInfo;
 import com.runky.auth.domain.AuthTokenService;
-import com.runky.auth.domain.port.SignupCacheTokenStore;
 import com.runky.auth.domain.port.TokenDecoder;
+import com.runky.auth.domain.signup.SignupTokenService;
 import com.runky.auth.domain.vo.DecodedToken;
 import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.member.domain.dto.MemberCommand;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthFacade {
 
 	private final OAuthClient oAuthClient;
-	private final SignupCacheTokenStore cacheTokenStore;
+	private final SignupTokenService signupTokenService;
 
 	private final MemberReader memberReader;
 	private final MemberRegistrar memberRegistrar;
@@ -44,7 +44,7 @@ public class AuthFacade {
 		boolean exists = memberReader.existsByExternalAccount(info.provider(), info.providerId());
 
 		if (!exists) {
-			String signupToken = cacheTokenStore.issueAndSave(info);
+			String signupToken = signupTokenService.issue(info);
 			return AuthResult.OAuthLogin.newUser(signupToken);
 		}
 
@@ -59,13 +59,13 @@ public class AuthFacade {
 	 */
 	@Transactional
 	public AuthResult.SigninComplete completeSignup(String signupToken, AuthCriteria.AdditionalSignUpData command) {
-		OAuthUserInfo info = cacheTokenStore.get(signupToken);
+		OAuthUserInfo info = signupTokenService.get(signupToken);
 
 		MemberInfo.Summary saved = memberRegistrar.registerFromExternal(
 			new MemberCommand.RegisterFromExternal(
 				info.provider(), info.providerId(), command.nickname()
 			));
-		cacheTokenStore.delete(signupToken);
+		signupTokenService.delete(signupToken);
 
 		AuthInfo.TokenPair pair = authTokenService.issue(saved.id(), saved.role().name());
 		return new AuthResult.SigninComplete(pair.accessToken(), pair.refreshToken());
