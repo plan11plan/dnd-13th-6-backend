@@ -7,6 +7,7 @@ import com.runky.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,4 +53,12 @@ public class CrewController implements CrewApiSpec {
         return ApiResponse.success(CrewResponse.Detail.from(result));
     }
 
+    @Override
+    @DeleteMapping("/{crewId}/members/me")
+    public ApiResponse<CrewResponse.Leave> leaveCrew(@Valid @RequestBody CrewRequest.Leave request,
+                                                     @PathVariable Long crewId,
+                                                     @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Leave result = crewFacade.leaveCrew(new CrewCriteria.Leave(crewId, userId, request.newLeaderId()));
+        return ApiResponse.success(CrewResponse.Leave.from(result));
+    }
 }

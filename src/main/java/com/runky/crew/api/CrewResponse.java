@@ -74,6 +74,14 @@ public class CrewResponse {
         }
     }
 
+    public record Leave(
+            Long crewId
+    ) {
+        public static Leave from(CrewResult.Leave result) {
+            return new Leave(result.crewId());
+        }
+    }
+
     private CrewResponse() {
     }
 }

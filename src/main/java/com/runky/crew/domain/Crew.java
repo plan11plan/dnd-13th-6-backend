@@ -112,9 +112,26 @@ public class Crew extends BaseTimeEntity {
         incrementActiveMemberCount();
     }
 
+    public void delegateLeader(Long newLeaderId) {
+        if (newLeaderId == null) {
+            throw new GlobalException(CrewErrorCode.HAVE_TO_DELEGATE_LEADER);
+
+        }
+        CrewMember leader = getLeader();
+        leader.demote();
+
+        CrewMember member = getMember(newLeaderId);
+        member.promote();
+        this.leaderId = newLeaderId;
+    }
+
     public boolean hasHistory(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId));
+    }
+
+    public boolean doesNotContainMember(Long memberId) {
+        return !containsMember(memberId);
     }
 
     public boolean containsMember(Long memberId) {

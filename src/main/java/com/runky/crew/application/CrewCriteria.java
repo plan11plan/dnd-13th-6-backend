@@ -44,6 +44,20 @@ public class CrewCriteria {
         }
     }
 
+    public record Leave(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+        public CrewCommand.Leave toCommand() {
+            return new CrewCommand.Leave(
+                    crewId,
+                    userId,
+                    newLeaderId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

@@ -37,7 +37,17 @@ public interface CrewApiSpec {
             description = "크루의 상세 정보를 조회합니다."
     )
     ApiResponse<CrewResponse.Detail> getCrew(
-            Long crewId,
+            @Schema(name = "크루 ID", description = "상세 조회할 크루 ID") Long crewId,
+            Long userId
+    );
+
+    @Operation(
+            summary = "크루 탈퇴",
+            description = "크루에서 탈퇴합니다."
+    )
+    ApiResponse<CrewResponse.Leave> leaveCrew(
+            @Schema(name = "멤버 ID", description = "새 리더로 지정할 멤버 ID") CrewRequest.Leave request,
+            @Schema(name = "크루 ID", description = "탈퇴할 크루 ID") Long crewId,
             Long userId
     );
 }

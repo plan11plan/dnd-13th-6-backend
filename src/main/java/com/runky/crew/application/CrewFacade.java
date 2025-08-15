@@ -38,4 +38,9 @@ public class CrewFacade {
         return new CrewResult.Detail(crew.getId(), crew.getName(), leaderNickname, crew.getNotice(),
                 crew.getActiveMemberCount(), goal, crew.getCode().value());
     }
+
+    public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {
+        Crew crew = crewService.leave(criteria.toCommand());
+        return new CrewResult.Leave(crew.getId(), crew.getName());
+    }
 }

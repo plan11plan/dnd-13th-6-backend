@@ -18,6 +18,9 @@ public enum CrewErrorCode implements ErrorCode {
     BANNED_MEMBER(HttpStatus.FORBIDDEN, "C107", "추방된 멤버입니다."),
     ALREADY_IN_CREW(HttpStatus.CONFLICT, "C108", "이미 크루에 참여한 상태입니다."),
     NOT_CREW_MEMBER(HttpStatus.FORBIDDEN, "C109", "크루 멤버가 아닙니다."),
+    NOT_CREW_LEADER(HttpStatus.FORBIDDEN, "C110", "크루 리더가 아닙니다."),
+    HAVE_TO_DELEGATE_LEADER(HttpStatus.BAD_REQUEST, "C111", "리더는 탈퇴 전 다른 멤버에게 리더를 위임해야 합니다."),
+
     ;
 
     private final HttpStatus status;

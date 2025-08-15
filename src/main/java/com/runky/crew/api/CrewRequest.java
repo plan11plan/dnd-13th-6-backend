@@ -15,6 +15,11 @@ public class CrewRequest {
     ) {
     }
 
+    public record Leave(
+            Long newLeaderId
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

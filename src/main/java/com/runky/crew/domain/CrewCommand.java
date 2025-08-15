@@ -19,6 +19,13 @@ public class CrewCommand {
     ) {
     }
 
+    public record Leave(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

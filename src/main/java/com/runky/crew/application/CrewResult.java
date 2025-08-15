@@ -42,4 +42,10 @@ public record CrewResult(
             String code
     ) {
     }
+
+    public record Leave(
+            Long crewId,
+            String name
+    ) {
+    }
 }

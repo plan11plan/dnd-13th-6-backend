@@ -47,9 +47,24 @@ public class CrewService {
     public Crew getCrew(CrewCommand.Detail command) {
         Crew crew = crewRepository.findById(command.crewId())
                 .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
-        if (!crew.containsMember(command.userId())) {
+        if (crew.doesNotContainMember(command.userId())) {
             throw new GlobalException(CrewErrorCode.NOT_CREW_MEMBER);
         }
+        return crew;
+    }
+
+    @Transactional
+    public Crew leave(CrewCommand.Leave command) {
+        Crew crew = crewRepository.findById(command.crewId())
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        if (crew.doesNotContainMember(command.userId())) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_MEMBER);
+        }
+        CrewMember member = crew.getMember(command.userId());
+        if (member.isLeader()) {
+            crew.delegateLeader(command.newLeaderId());
+        }
+        crew.leaveMember(command.userId());
         return crew;
     }
 }
