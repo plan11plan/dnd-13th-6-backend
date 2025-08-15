@@ -96,4 +96,33 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().crewId()).isEqualTo(savedCrew.getId());
         }
     }
+
+    @Nested
+    @DisplayName("GET /api/crews")
+    class GetCrews {
+        final String BASE_URL = "/api/crews";
+
+        @Test
+        @DisplayName("사용자의 크루 목록을 조회한다.")
+        void getCrews() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew1 = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew 1"), new Code("abc123")));
+            Crew crew2 = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew 2"), new Code("abc456")));
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Cards>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Cards>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().crews()).hasSize(2);
+            assertThat(response.getBody().getResult().crews())
+                    .extracting("crewId")
+                    .containsExactlyInAnyOrder(crew1.getId(), crew2.getId());
+        }
+    }
 }

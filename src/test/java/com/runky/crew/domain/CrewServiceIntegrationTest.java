@@ -1,6 +1,5 @@
 package com.runky.crew.domain;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.utils.DatabaseCleanUp;
@@ -80,6 +79,18 @@ class CrewServiceIntegrationTest {
         }
     }
 
+    @Test
+    @DisplayName("사용자가 속한 크루를 조회한다.")
+    void getCrewsOfUser() {
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 1"), new Code("abc123")));
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 2"), new Code("abc123")));
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 3"), new Code("abc123")));
+
+        List<Crew> crews = crewService.getCrewsOfUser(1L);
+
+        assertThat(crews).hasSize(3);
+    }
+
     @Nested
     @DisplayName("동시성 테스트")
     class Concurrency {
@@ -107,7 +118,6 @@ class CrewServiceIntegrationTest {
             }
             start.countDown();
             latch.await();
-
 
             CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(1L).orElseThrow();
             List<CrewMember> crewMembers = crewRepository.findCrewMemberOfUser(1L);
