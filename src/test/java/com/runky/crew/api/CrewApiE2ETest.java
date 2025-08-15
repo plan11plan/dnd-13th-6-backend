@@ -1,5 +1,6 @@
 package com.runky.crew.api;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
@@ -123,6 +124,36 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().crews())
                     .extracting("crewId")
                     .containsExactlyInAnyOrder(crew1.getId(), crew2.getId());
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/crews/{crewId}")
+    class GetCrew {
+        final String BASE_URL = "/api/crews/{crewId}";
+
+        @Test
+        @DisplayName("크루의 상세 정보를 조회한다.")
+        void getCrew() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123")));
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Detail>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType,
+                            crew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().crewId()).isEqualTo(crew.getId());
+            assertThat(response.getBody().getResult().name()).isEqualTo(crew.getName());
+            assertThat(response.getBody().getResult().code()).isEqualTo(crew.getCode().value());
+            assertThat(response.getBody().getResult().memberCount()).isEqualTo(crew.getActiveMemberCount());
+            assertThat(response.getBody().getResult().notice()).isEqualTo(crew.getNotice());
         }
     }
 }

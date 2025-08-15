@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
+import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
 import java.util.Optional;
@@ -81,5 +82,39 @@ class CrewServiceTest {
             assertThat(joinedCrew.getMember(3L).getRole()).isEqualTo(CrewMember.Role.MEMBER);
             assertThat(joinedCrew.getMember(3L).isInCrew()).isTrue();
         }
+    }
+
+    @Nested
+    @DisplayName("크루 상세 조회 시,")
+    class Detail {
+        @Test
+        @DisplayName("크루가 존재하지 않으면 NOT_FOUND_CREW 예외를 발생시킨다.")
+        void throwNotFoundCrewException_whenCrewNotFound() {
+            CrewCommand.Detail command = new CrewCommand.Detail(1L, 2L);
+            given(crewRepository.findById(command.crewId()))
+                    .willReturn(Optional.empty());
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getCrew(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        }
+
+        @Test
+        @DisplayName("사용자가 크루 멤버가 아니면 NOT_CREW_MEMBER 예외를 발생시킨다.")
+        void throwNotCrewMemberException_whenUserNotInCrew() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("abc123"));
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Detail command = new CrewCommand.Detail(crew.getId(), 3L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getCrew(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
+
     }
 }
