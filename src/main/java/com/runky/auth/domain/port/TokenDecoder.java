@@ -1,7 +1,7 @@
 package com.runky.auth.domain.port;
 
-import com.runky.auth.domain.vo.DecodedToken;
+import com.runky.auth.domain.vo.RefreshTokenClaims;
 
 public interface TokenDecoder {
-	DecodedToken decodeRefresh(String refreshToken);
+	RefreshTokenClaims decodeRefresh(String refreshToken);
 }

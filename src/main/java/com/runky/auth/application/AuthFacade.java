@@ -8,8 +8,8 @@ import com.runky.auth.domain.AuthInfo;
 import com.runky.auth.domain.AuthTokenService;
 import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.auth.domain.signup.SignupTokenService;
-import com.runky.auth.domain.vo.DecodedToken;
 import com.runky.auth.domain.vo.OAuthUserInfo;
+import com.runky.auth.domain.vo.RefreshTokenClaims;
 import com.runky.member.domain.dto.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
 import com.runky.member.domain.service.MemberReader;
@@ -80,7 +80,7 @@ public class AuthFacade {
 
 	@Transactional
 	public void logoutByRefresh(String refreshToken) {
-		DecodedToken decoded = tokenDecoder.decodeRefresh(refreshToken);
+		RefreshTokenClaims decoded = tokenDecoder.decodeRefresh(refreshToken);
 		authTokenService.delete(decoded.memberId());
 	}
 }

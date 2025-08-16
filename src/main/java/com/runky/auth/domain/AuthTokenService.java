@@ -7,8 +7,8 @@ import com.runky.auth.domain.port.RefreshTokenRepository;
 import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.auth.domain.port.TokenHasher;
 import com.runky.auth.domain.port.TokenIssuer;
-import com.runky.auth.domain.vo.DecodedToken;
 import com.runky.auth.domain.vo.IssuedTokens;
+import com.runky.auth.domain.vo.RefreshTokenClaims;
 import com.runky.auth.exception.domain.TokenMismatchException;
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class AuthTokenService {
 	@Transactional
 	public AuthInfo.TokenPair rotateByRefreshToken(String refreshToken) {
 
-		DecodedToken decoded = tokenDecoder.decodeRefresh(refreshToken);
+		RefreshTokenClaims decoded = tokenDecoder.decodeRefresh(refreshToken);
 		String providedHash = tokenHasher.hash(refreshToken);
 
 		RefreshToken current = refreshTokenRepository.findByMemberIdAndTokenHash(
