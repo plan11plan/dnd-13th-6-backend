@@ -50,4 +50,13 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "탈퇴할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루원 목록 조회",
+            description = "크루의 멤버를 조회합니다."
+    )
+    ApiResponse<CrewResponse.Members> getCrewMembers(
+            @Schema(name = "크루 ID", description = "멤버를 조회할 크루 ID") Long crewId,
+            Long userId
+    );
 }

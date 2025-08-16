@@ -61,4 +61,15 @@ public class CrewController implements CrewApiSpec {
         CrewResult.Leave result = crewFacade.leaveCrew(new CrewCriteria.Leave(crewId, userId, request.newLeaderId()));
         return ApiResponse.success(CrewResponse.Leave.from(result));
     }
+
+    @Override
+    @GetMapping("/{crewId}/members")
+    public ApiResponse<CrewResponse.Members> getCrewMembers(@PathVariable Long crewId,
+                                                            @RequestHeader("X-USER-ID") Long userId) {
+        List<CrewResult.CrewMember> results = crewFacade.getCrewMembers(new CrewCriteria.Members(crewId, userId));
+        List<CrewResponse.Member> members = results.stream()
+                .map(CrewResponse.Member::from)
+                .toList();
+        return ApiResponse.success(new CrewResponse.Members(members));
+    }
 }

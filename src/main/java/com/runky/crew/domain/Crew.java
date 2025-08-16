@@ -170,4 +170,10 @@ public class Crew extends BaseTimeEntity {
                 .findFirst()
                 .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
     }
+
+    public List<CrewMember> getActiveMembers() {
+        return this.members.stream()
+                .filter(CrewMember::isInCrew)
+                .toList();
+    }
 }

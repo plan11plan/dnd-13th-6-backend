@@ -58,6 +58,18 @@ public class CrewCriteria {
         }
     }
 
+    public record Members(
+            Long crewId,
+            Long userId
+    ) {
+        public CrewCommand.Members toCommand() {
+            return new CrewCommand.Members(
+                    crewId,
+                    userId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

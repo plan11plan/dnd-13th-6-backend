@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,6 +38,14 @@ public class CrewFacade {
         String leaderNickname = "leader"; // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
         return new CrewResult.Detail(crew.getId(), crew.getName(), leaderNickname, crew.getNotice(),
                 crew.getActiveMemberCount(), goal, crew.getCode().value());
+    }
+
+    public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {
+        List<CrewMember> members = crewService.getCrewMembers(criteria.toCommand());
+        // TODO 크루원 캐릭터 이미지 + 닉네임 불러오는 작업 추가
+        return members.stream()
+                .map(member -> new CrewResult.CrewMember(member.getId(), "nickname", "runky/1.png"))
+                .toList();
     }
 
     public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {

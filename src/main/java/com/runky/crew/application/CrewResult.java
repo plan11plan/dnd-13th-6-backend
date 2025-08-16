@@ -43,6 +43,13 @@ public record CrewResult(
     ) {
     }
 
+    public record CrewMember(
+            Long memberId,
+            String nickname,
+            String character
+    ) {
+    }
+
     public record Leave(
             Long crewId,
             String name
