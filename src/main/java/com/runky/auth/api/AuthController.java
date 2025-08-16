@@ -73,10 +73,12 @@ public class AuthController implements AuthApiSpec {
 		AuthResult.SigninComplete result = authFacade.completeSignup(signupToken,
 			new AuthCriteria.AdditionalSignUpData(request.nickname()));
 
+		ResponseCookie st = cookieProvider.delete("signupToken");
+
 		ResponseCookie at = cookieProvider.accessToken(result.accessToken());
 		ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
 
-		return responseHelper.successWithCookies(List.of(at, rt), servletResponse);
+		return responseHelper.successWithCookies(List.of(st, at, rt), servletResponse);
 	}
 
 	/**
