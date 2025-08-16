@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -377,6 +378,29 @@ class CrewTest {
 
             assertThat(member.getMemberId()).isEqualTo(2L);
             assertThat(member.getRole()).isEqualTo(CrewMember.Role.MEMBER);
+        }
+    }
+
+    @Nested
+    @DisplayName("크루의 활동 멤버 조회 시,")
+    class GetActiveMembers {
+
+        @Test
+        @DisplayName("크루의 활동 멤버를 조회한다.")
+        void getActiveMembers() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            crew.joinMember(4L);
+            crew.leaveMember(4L);
+
+            List<CrewMember> activeMembers = crew.getActiveMembers();
+
+            assertThat(activeMembers).hasSize(3);
+            assertThat(activeMembers).extracting("memberId")
+                    .containsExactlyInAnyOrder(1L, 2L, 3L);
         }
     }
 }
