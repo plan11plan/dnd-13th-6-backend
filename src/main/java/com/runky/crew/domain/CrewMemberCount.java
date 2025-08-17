@@ -51,4 +51,11 @@ public class CrewMemberCount {
         }
         crewCount++;
     }
+
+    public void decrement() {
+        if (crewCount <= 0) {
+            throw new GlobalException(CrewErrorCode.NOT_IN_CREW);
+        }
+        crewCount--;
+    }
 }

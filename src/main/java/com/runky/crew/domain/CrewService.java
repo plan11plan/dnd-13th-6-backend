@@ -75,6 +75,9 @@ public class CrewService {
             crew.delegateLeader(command.newLeaderId());
         }
         crew.leaveMember(command.userId());
+        CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(command.userId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        crewMemberCount.decrement();
         return crew;
     }
 }
