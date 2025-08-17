@@ -7,6 +7,7 @@ import com.runky.crew.domain.CrewRepository;
 import com.runky.crew.domain.CrewMemberCount;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -51,6 +52,11 @@ public class CrewRepositoryImpl implements CrewRepository {
     @Override
     public CrewMemberCount save(CrewMemberCount crewMemberCount) {
         return memberCrewCountJpaRepository.save(crewMemberCount);
+    }
+
+    @Override
+    public List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds) {
+        return memberCrewCountJpaRepository.findByMemberIdIn(userIds);
     }
 
     @Override

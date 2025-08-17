@@ -110,6 +110,11 @@ public class CrewResponse {
     ) {
     }
 
+    public record Disband(
+            String name
+    ) {
+    }
+
     private CrewResponse() {
     }
 }

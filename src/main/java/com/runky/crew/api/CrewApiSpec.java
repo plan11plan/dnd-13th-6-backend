@@ -79,4 +79,13 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "이름을 수정할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루 해체",
+            description = "크루를 해체합니다."
+    )
+    ApiResponse<CrewResponse.Disband> disbandCrew(
+            @Schema(name = "크루 ID", description = "해체할 크루 ID") Long crewId,
+            Long userId
+    );
 }

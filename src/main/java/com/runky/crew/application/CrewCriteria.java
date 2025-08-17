@@ -98,6 +98,18 @@ public class CrewCriteria {
         }
     }
 
+    public record Disband(
+            Long crewId,
+            Long userId
+    ) {
+        public CrewCommand.Disband toCommand() {
+            return new CrewCommand.Disband(
+                    crewId,
+                    userId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

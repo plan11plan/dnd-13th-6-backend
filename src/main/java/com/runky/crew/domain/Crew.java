@@ -117,6 +117,18 @@ public class Crew extends BaseTimeEntity {
         this.leaderId = newLeaderId;
     }
 
+    public List<CrewMember> disband() {
+        CrewMember leader = getLeader();
+        leader.demote();
+        List<CrewMember> activeMembers = getActiveMembers();
+        for (CrewMember member : activeMembers) {
+            member.leave();
+        }
+        this.activeMemberCount = 0L;
+        delete();
+        return activeMembers;
+    }
+
     public void updateNotice(String notice) {
         if (notice == null || notice.length() > CrewConstants.MAX_CREW_NOTICE_LENGTH.value()) {
             throw new GlobalException(CrewErrorCode.INVALID_NOTICE);

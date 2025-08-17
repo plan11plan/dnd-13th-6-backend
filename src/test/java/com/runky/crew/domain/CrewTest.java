@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -348,6 +349,77 @@ class CrewTest {
 
         assertThat(leader.getRole()).isEqualTo(CrewMember.Role.LEADER);
         assertThat(leader.getMemberId()).isEqualTo(1L);
+    }
+
+    @Nested
+    @DisplayName("크루 해체 시,")
+    class Disband {
+
+        @Test
+        @DisplayName("모든 멤버의 상태는 LEFT로 변경된다.")
+        void changeAllMembersToLeft() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.disband();
+
+            List<CrewMember> members = crew.getMembers();
+            assertThat(members).allMatch(member -> member.getRole() == CrewMember.Role.LEFT);
+        }
+
+        @Test
+        @DisplayName("크루의 활동 멤버 수는 0이 된다.")
+        void setActiveMemberCountToZero() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.disband();
+
+            assertThat(crew.getActiveMemberCount()).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("deletedAt이 기록된다.")
+        void recordDeletedAt() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            ZonedDateTime before = crew.getDeletedAt();
+
+            crew.disband();
+
+            ZonedDateTime after = crew.getDeletedAt();
+            assertThat(before).isNull();
+            assertThat(after).isNotNull();
+        }
+
+        @Test
+        @DisplayName("해체 당시 크루 멤버들을 반환한다.")
+        void returnMembersOnDisband() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            crew.banMember(3L);
+            crew.joinMember(4L);
+            crew.leaveMember(4L);
+            List<CrewMember> activeMembers = crew.getActiveMembers();
+
+            List<CrewMember> disbandedMembers = crew.disband();
+
+            assertThat(disbandedMembers).hasSize(2);
+            assertThat(disbandedMembers).extracting("memberId")
+                    .containsExactlyInAnyOrder(1L, 2L);
+        }
     }
 
     @Nested

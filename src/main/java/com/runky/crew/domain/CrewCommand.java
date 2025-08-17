@@ -46,6 +46,12 @@ public class CrewCommand {
     ) {
     }
 
+    public record Disband(
+            Long crewId,
+            Long userId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

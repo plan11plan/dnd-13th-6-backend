@@ -64,4 +64,9 @@ public class CrewFacade {
         Crew crew = crewLeaderService.updateName(criteria.toCommand());
         return CrewResult.from(crew);
     }
+
+    public CrewResult disband(CrewCriteria.Disband criteria) {
+        Crew crew = crewLeaderService.disband(criteria.toCommand());
+        return CrewResult.from(crew);
+    }
 }

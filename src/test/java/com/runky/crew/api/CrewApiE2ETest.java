@@ -275,4 +275,37 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().name()).isEqualTo("New Crew Name");
         }
     }
+
+    @Nested
+    @DisplayName("DELETE /api/crews/{crewId}")
+    class DeleteCrew {
+        final String BASE_URL = "/api/crews/{crewId}";
+
+        @Test
+        @DisplayName("크루를 삭제한다.")
+        void deleteCrew() {
+            long userId = 1L;
+            CrewMemberCount count1 = CrewMemberCount.of(1L);
+            count1.increment();
+            CrewMemberCount count2 = CrewMemberCount.of(2L);
+            count2.increment();
+            crewRepository.save(count1);
+            crewRepository.save(count2);
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Disband>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Disband>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders), responseType,
+                            savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().name()).isEqualTo(savedCrew.getName());
+        }
+    }
 }

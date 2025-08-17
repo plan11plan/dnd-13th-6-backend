@@ -91,4 +91,12 @@ public class CrewController implements CrewApiSpec {
         CrewResult result = crewFacade.updateName(new CrewCriteria.UpdateName(crewId, userId, request.name()));
         return ApiResponse.success(new CrewResponse.Name(result.name()));
     }
+
+    @Override
+    @DeleteMapping("/{crewId}")
+    public ApiResponse<CrewResponse.Disband> disbandCrew(@PathVariable Long crewId,
+                                                         @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.disband(new CrewCriteria.Disband(crewId, userId));
+        return ApiResponse.success(new CrewResponse.Disband(result.name()));
+    }
 }
