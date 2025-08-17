@@ -69,4 +69,13 @@ public class CrewFacade {
         Crew crew = crewLeaderService.disband(criteria.toCommand());
         return CrewResult.from(crew);
     }
+
+    public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
+        Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
+
+        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
+        String leaderNickname = "Leader Nickname";
+
+        return new CrewResult.Delegate(crew.getLeaderId(), leaderNickname);
+    }
 }

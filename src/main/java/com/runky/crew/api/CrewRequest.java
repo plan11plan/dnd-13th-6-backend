@@ -30,6 +30,11 @@ public class CrewRequest {
     ) {
     }
 
+    public record Delegate(
+            Long newLeaderId
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

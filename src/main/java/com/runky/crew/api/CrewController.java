@@ -99,4 +99,14 @@ public class CrewController implements CrewApiSpec {
         CrewResult result = crewFacade.disband(new CrewCriteria.Disband(crewId, userId));
         return ApiResponse.success(new CrewResponse.Disband(result.name()));
     }
+
+    @Override
+    @PatchMapping("/{crewId}/leader")
+    public ApiResponse<CrewResponse.Delegate> delegateLeader(@RequestBody CrewRequest.Delegate request,
+                                                             @PathVariable Long crewId,
+                                                             @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Delegate result = crewFacade.delegateLeader(
+                new CrewCriteria.Delegate(crewId, userId, request.newLeaderId()));
+        return ApiResponse.success(new CrewResponse.Delegate(result.leaderId(), result.leaderNickname()));
+    }
 }

@@ -153,4 +153,53 @@ class CrewLeaderServiceTest {
             assertThat(memberCount3.getCrewCount()).isEqualTo(0);
         }
     }
+
+    @Nested
+    @DisplayName("크루 리더 위임 시,")
+    class DelegateLeader {
+
+        @Test
+        @DisplayName("크루가 존재하지 않으면 NOT_FOUND_CREW 예외를 발생시킨다.")
+        void throwNotFoundCrewException_whenCrewNotFound() {
+            CrewCommand.Delegate command = new CrewCommand.Delegate(1L, 2L, 3L);
+            given(crewRepository.findById(command.crewId()))
+                    .willReturn(Optional.empty());
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewLeaderService.delegateLeader(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        }
+
+        @Test
+        @DisplayName("사용자가 크루 리더가 아니면 NOT_CREW_LEADER 예외를 발생시킨다.")
+        void throwNotCrewLeaderException_whenUserNotLeader() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Delegate command = new CrewCommand.Delegate(crew.getId(), 3L, 4L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewLeaderService.delegateLeader(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_LEADER));
+        }
+
+        @Test
+        @DisplayName("크루의 리더 ID는 새로운 리더 ID로 변경된다.")
+        void updateCrewLeaderId_whenDelegatingLeader() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Delegate command = new CrewCommand.Delegate(crew.getId(), 1L, 2L);
+
+            Crew updatedCrew = crewLeaderService.delegateLeader(command);
+
+            assertThat(updatedCrew.getLeaderId()).isEqualTo(2L);
+        }
+    }
 }

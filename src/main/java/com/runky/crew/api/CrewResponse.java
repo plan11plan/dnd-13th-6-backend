@@ -115,6 +115,12 @@ public class CrewResponse {
     ) {
     }
 
+    public record Delegate(
+            Long leaderId,
+            String leaderNickname
+    ) {
+    }
+
     private CrewResponse() {
     }
 }

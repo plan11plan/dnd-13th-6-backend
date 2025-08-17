@@ -54,4 +54,15 @@ public class CrewLeaderService {
 
         return crew;
     }
+
+    @Transactional
+    public Crew delegateLeader(CrewCommand.Delegate command) {
+        Crew crew = crewRepository.findById(command.crewId())
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        if (!crew.isLeader(command.userId())) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_LEADER);
+        }
+        crew.delegateLeader(command.newLeaderId());
+        return crew;
+    }
 }

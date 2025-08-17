@@ -88,4 +88,14 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "해체할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루 리더 위임",
+            description = "크루의 리더를 다른 멤버로 위임합니다."
+    )
+    ApiResponse<CrewResponse.Delegate> delegateLeader(
+            @Schema(name = "크루 리더 위임 요청", description = "새 리더의 ID") CrewRequest.Delegate request,
+            @Schema(name = "크루 ID", description = "리더를 위임할 크루 ID") Long crewId,
+            Long userId
+    );
 }

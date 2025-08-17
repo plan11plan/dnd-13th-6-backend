@@ -110,6 +110,20 @@ public class CrewCriteria {
         }
     }
 
+    public record Delegate(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+        public CrewCommand.Delegate toCommand() {
+            return new CrewCommand.Delegate(
+                    crewId,
+                    userId,
+                    newLeaderId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

@@ -55,4 +55,10 @@ public record CrewResult(
             String name
     ) {
     }
+
+    public record Delegate(
+            Long leaderId,
+            String leaderNickname
+    ) {
+    }
 }

@@ -52,6 +52,13 @@ public class CrewCommand {
     ) {
     }
 
+    public record Delegate(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }
