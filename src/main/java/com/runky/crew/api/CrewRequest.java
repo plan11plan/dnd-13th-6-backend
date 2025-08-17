@@ -20,6 +20,11 @@ public class CrewRequest {
     ) {
     }
 
+    public record Notice(
+            String notice
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

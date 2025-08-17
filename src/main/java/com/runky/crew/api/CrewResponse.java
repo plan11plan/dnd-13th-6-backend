@@ -82,17 +82,15 @@ public class CrewResponse {
         }
     }
 
-    private CrewResponse() {
-    }
-
     public record Members(List<Member> members) {
-    }
 
+    }
     public record Member(
             Long memberId,
             String nickname,
             String character
     ) {
+
         public static Member from(CrewResult.CrewMember member) {
             return new Member(
                     member.memberId(),
@@ -100,5 +98,13 @@ public class CrewResponse {
                     member.character()
             );
         }
+    }
+
+    public record Notice(
+            String notice
+    ) {
+    }
+
+    private CrewResponse() {
     }
 }

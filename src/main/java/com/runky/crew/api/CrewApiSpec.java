@@ -59,4 +59,14 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "멤버를 조회할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루 공지사항 수정",
+            description = "크루의 공지사항을 수정합니다."
+    )
+    ApiResponse<CrewResponse.Notice> updateNotice(
+            @Schema(name = "크루 공지사항 수정 요청", description = "크루 공지사항 수정에 필요한 정보") CrewRequest.Notice request,
+            @Schema(name = "크루 ID", description = "공지사항을 수정할 크루 ID") Long crewId,
+            Long userId
+    );
 }

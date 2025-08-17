@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,5 +72,14 @@ public class CrewController implements CrewApiSpec {
                 .map(CrewResponse.Member::from)
                 .toList();
         return ApiResponse.success(new CrewResponse.Members(members));
+    }
+
+    @Override
+    @PatchMapping("/{crewId}/notice")
+    public ApiResponse<CrewResponse.Notice> updateNotice(@RequestBody CrewRequest.Notice request,
+                                                         @PathVariable Long crewId,
+                                                         @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.updateNotice(new CrewCriteria.UpdateNotice(crewId, userId, request.notice()));
+        return ApiResponse.success(new CrewResponse.Notice(result.notice()));
     }
 }

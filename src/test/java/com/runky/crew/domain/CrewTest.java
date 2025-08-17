@@ -349,6 +349,39 @@ class CrewTest {
     }
 
     @Nested
+    @DisplayName("크루 공지 변경 시,")
+    class UpdateNotice {
+
+        @Test
+        @DisplayName("변경 내용이 존재하지 않다면, INVALID_NOTICE 예외가 발생한다.")
+        void throwInvalidNoticeException_whenNoticeIsNull() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateNotice(null));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.INVALID_NOTICE));
+        }
+
+        @Test
+        @DisplayName("변경 내용이 20자를 초과하면, INVALID_NOTICE 예외가 발생한다.")
+        void throwInvalidNoticeException_whenNoticeIsOver20Characters() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateNotice("This notice is way too long for the limit."));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.INVALID_NOTICE));
+        }
+    }
+
+    @Nested
     @DisplayName("크루 내 가입했던 멤버 조회 시,")
     class GetHistory {
 

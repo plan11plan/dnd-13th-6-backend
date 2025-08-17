@@ -70,6 +70,20 @@ public class CrewCriteria {
         }
     }
 
+    public record UpdateNotice(
+            Long crewId,
+            Long userId,
+            String notice
+    ) {
+        public CrewCommand.UpdateNotice toCommand() {
+            return new CrewCommand.UpdateNotice(
+                    crewId,
+                    userId,
+                    notice
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

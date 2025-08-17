@@ -117,6 +117,13 @@ public class Crew extends BaseTimeEntity {
         this.leaderId = newLeaderId;
     }
 
+    public void updateNotice(String notice) {
+        if (notice == null || notice.length() > CrewConstants.MAX_CREW_NOTICE_LENGTH.value()) {
+            throw new GlobalException(CrewErrorCode.INVALID_NOTICE);
+        }
+        this.notice = notice;
+    }
+
     public boolean hasHistory(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId));
@@ -129,6 +136,10 @@ public class Crew extends BaseTimeEntity {
     public boolean containsMember(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId) && member.isInCrew());
+    }
+
+    public boolean isLeader(Long memberId) {
+        return this.leaderId.equals(memberId);
     }
 
     public void incrementActiveMemberCount() {

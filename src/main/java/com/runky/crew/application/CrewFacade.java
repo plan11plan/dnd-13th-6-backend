@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CrewFacade {
     private final CrewService crewService;
+    private final CrewLeaderService crewLeaderService;
 
     public CrewResult create(CrewCriteria.Create criteria) {
         Crew crew = crewService.create(criteria.toCommand());
@@ -51,5 +53,10 @@ public class CrewFacade {
     public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {
         Crew crew = crewService.leave(criteria.toCommand());
         return new CrewResult.Leave(crew.getId(), crew.getName());
+    }
+
+    public CrewResult updateNotice(CrewCriteria.UpdateNotice criteria) {
+        Crew crew = crewLeaderService.updateNotice(criteria.toCommand());
+        return CrewResult.from(crew);
     }
 }

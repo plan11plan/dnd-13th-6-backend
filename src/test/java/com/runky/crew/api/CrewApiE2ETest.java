@@ -219,4 +219,32 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().members()).hasSize(3);
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/crews/{crewId}/notice")
+    class UpdateNotice {
+        final String BASE_URL = "/api/crews/{crewId}/notice";
+
+        @Test
+        @DisplayName("크루의 공지사항을 업데이트한다.")
+        void updateNotice() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            CrewRequest.Notice request = new CrewRequest.Notice("New Notice");
+            ResponseEntity<ApiResponse<CrewResponse.Detail>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
+                            responseType, savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().notice()).isEqualTo("New Notice");
+        }
+    }
 }
