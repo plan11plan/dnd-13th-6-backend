@@ -59,6 +59,13 @@ public class CrewCommand {
     ) {
     }
 
+    public record Ban(
+            Long crewId,
+            Long userId,
+            Long banMemberId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

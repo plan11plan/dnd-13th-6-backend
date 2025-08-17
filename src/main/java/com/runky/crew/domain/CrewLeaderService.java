@@ -1,6 +1,7 @@
 package com.runky.crew.domain;
 
 import com.runky.crew.error.CrewErrorCode;
+import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
 import java.util.List;
 import java.util.Set;
@@ -64,5 +65,21 @@ public class CrewLeaderService {
         }
         crew.delegateLeader(command.newLeaderId());
         return crew;
+    }
+
+    @Transactional
+    public CrewMember ban(CrewCommand.Ban command) {
+        Crew crew = crewRepository.findById(command.crewId())
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        if (!crew.isLeader(command.userId())) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_LEADER);
+        }
+        CrewMember crewMember = crew.banMember(command.banMemberId());
+
+        CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(command.banMemberId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        crewMemberCount.decrement();
+
+        return crewMember;
     }
 }

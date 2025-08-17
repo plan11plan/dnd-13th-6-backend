@@ -121,6 +121,12 @@ public class CrewResponse {
     ) {
     }
 
+    public record Ban(
+            Long targetId,
+            String nickname
+    ) {
+    }
+
     private CrewResponse() {
     }
 }

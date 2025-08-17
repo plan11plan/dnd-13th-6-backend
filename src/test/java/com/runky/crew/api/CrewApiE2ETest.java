@@ -336,4 +336,37 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().leaderId()).isEqualTo(2L);
         }
     }
+
+    @Nested
+    @DisplayName("DELETE /api/crews/{crewId}/members/{memberId}")
+    class BanMember {
+        final String BASE_URL = "/api/crews/{crewId}/members/{memberId}";
+
+        @Test
+        @DisplayName("크루에서 멤버를 추방한다.")
+        void banMember() {
+            long userId = 1L;
+            CrewMemberCount count1 = CrewMemberCount.of(1L);
+            count1.increment();
+            CrewMemberCount count2 = CrewMemberCount.of(2L);
+            count2.increment();
+            crewRepository.save(count1);
+            crewRepository.save(count2);
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(1L));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Ban>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Ban>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders), responseType,
+                            savedCrew.getId(), 2L);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().targetId()).isEqualTo(2L);
+        }
+    }
 }

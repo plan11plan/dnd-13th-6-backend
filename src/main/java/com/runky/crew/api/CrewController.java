@@ -109,4 +109,13 @@ public class CrewController implements CrewApiSpec {
                 new CrewCriteria.Delegate(crewId, userId, request.newLeaderId()));
         return ApiResponse.success(new CrewResponse.Delegate(result.leaderId(), result.leaderNickname()));
     }
+
+    @Override
+    @DeleteMapping("/{crewId}/members/{memberId}")
+    public ApiResponse<CrewResponse.Ban> banMember(@PathVariable("crewId") Long crewId,
+                                                   @PathVariable("memberId") Long targetId,
+                                                   @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Ban result = crewFacade.banMember(new CrewCriteria.Ban(crewId, userId, targetId));
+        return ApiResponse.success(new CrewResponse.Ban(result.targetId(), result.nickname()));
+    }
 }

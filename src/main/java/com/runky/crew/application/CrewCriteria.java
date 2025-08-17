@@ -124,6 +124,20 @@ public class CrewCriteria {
         }
     }
 
+    public record Ban(
+            Long crewId,
+            Long userId,
+            Long targetUserId
+    ) {
+        public CrewCommand.Ban toCommand() {
+            return new CrewCommand.Ban(
+                    crewId,
+                    userId,
+                    targetUserId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

@@ -98,4 +98,14 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "리더를 위임할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루원 추방",
+            description = "크루에서 특정 멤버를 추방합니다."
+    )
+    ApiResponse<CrewResponse.Ban> banMember(
+            @Schema(name = "추방할 사용자 ID", description = "추방할 멤버의 ID") Long targetId,
+            @Schema(name = "크루 ID", description = "멤버를 추방할 크루 ID") Long crewId,
+            Long userId
+    );
 }

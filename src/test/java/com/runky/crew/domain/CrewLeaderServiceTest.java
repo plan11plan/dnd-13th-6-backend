@@ -1,5 +1,6 @@
 package com.runky.crew.domain;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -200,6 +201,58 @@ class CrewLeaderServiceTest {
             Crew updatedCrew = crewLeaderService.delegateLeader(command);
 
             assertThat(updatedCrew.getLeaderId()).isEqualTo(2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("크루 멤버 추방 시,")
+    class Ban {
+        @Test
+        @DisplayName("크루가 존재하지 않으면 NOT_FOUND_CREW 예외를 발생시킨다.")
+        void throwNotFoundCrewException_whenCrewNotFound() {
+            CrewCommand.Ban command = new CrewCommand.Ban(1L, 2L, 3L);
+            given(crewRepository.findById(command.crewId()))
+                    .willReturn(Optional.empty());
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewLeaderService.ban(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        }
+
+        @Test
+        @DisplayName("사용자가 크루 리더가 아니면 NOT_CREW_LEADER 예외를 발생시킨다.")
+        void throwNotCrewLeaderException_whenUserNotLeader() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewCommand.Ban command = new CrewCommand.Ban(crew.getId(), 3L, 4L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewLeaderService.ban(command));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_LEADER));
+        }
+
+        @Test
+        @DisplayName("해당 멤버의 속한 크루 수는 감소한다.")
+        void banMember_whenBanningMember() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            given(crewRepository.findById(crew.getId()))
+                    .willReturn(Optional.of(crew));
+            CrewMemberCount crewMemberCount = CrewMemberCount.of(2L);
+            crewMemberCount.increment();
+            given(crewRepository.findCountByMemberId(2L))
+                    .willReturn(Optional.of(crewMemberCount));
+            CrewCommand.Ban command = new CrewCommand.Ban(crew.getId(), 1L, 2L);
+
+            crewLeaderService.ban(command);
+
+            assertThat(crewMemberCount.getCrewCount()).isEqualTo(0);
         }
     }
 }

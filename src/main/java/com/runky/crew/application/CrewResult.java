@@ -61,4 +61,10 @@ public record CrewResult(
             String leaderNickname
     ) {
     }
+
+    public record Ban(
+            Long targetId,
+            String nickname
+    ) {
+    }
 }

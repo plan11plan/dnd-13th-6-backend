@@ -78,4 +78,13 @@ public class CrewFacade {
 
         return new CrewResult.Delegate(crew.getLeaderId(), leaderNickname);
     }
+
+    public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
+        CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
+
+        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
+        String bannedNickname = "Banned Nickname";
+
+        return new CrewResult.Ban(bannedMember.getMemberId(), bannedNickname);
+    }
 }
