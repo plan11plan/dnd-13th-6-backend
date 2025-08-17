@@ -59,6 +59,39 @@ class CrewServiceIntegrationTest {
     }
 
     @Nested
+    @DisplayName("크루 가입 시,")
+    class Join {
+
+        @Test
+        @DisplayName("재가입하는 경우, 기존 CrewMember의 상태가 MEMBER로 변경된다.")
+        void rejoinCrewMember() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("ABC123"));
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            CrewMember before = crew.leaveMember(3L);
+            crewRepository.save(CrewMemberCount.of(3L));
+            Crew saveCrew = crewRepository.save(crew);
+
+            Crew joinedCrew = crewService.join(new CrewCommand.Join(3L, saveCrew.getCode().value()));
+
+            assertThat(before.getRole()).isEqualTo(CrewMember.Role.LEFT);
+            assertThat(joinedCrew.getMember(3L).getRole()).isEqualTo(CrewMember.Role.MEMBER);
+        }
+    }
+
+    @Test
+    @DisplayName("사용자가 속한 크루를 조회한다.")
+    void getCrewsOfUser() {
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 1"), new Code("abc123")));
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 2"), new Code("abc123")));
+        crewRepository.save(Crew.of(new CrewCommand.Create(1L, "Crew 3"), new Code("abc123")));
+
+        List<Crew> crews = crewService.getCrewsOfUser(1L);
+
+        assertThat(crews).hasSize(3);
+    }
+
+    @Nested
     @DisplayName("동시성 테스트")
     class Concurrency {
         @Test
@@ -85,7 +118,6 @@ class CrewServiceIntegrationTest {
             }
             start.countDown();
             latch.await();
-
 
             CrewMemberCount crewMemberCount = crewRepository.findCountByMemberId(1L).orElseThrow();
             List<CrewMember> crewMembers = crewRepository.findCrewMemberOfUser(1L);

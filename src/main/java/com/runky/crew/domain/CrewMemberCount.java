@@ -42,7 +42,7 @@ public class CrewMemberCount {
     }
 
     public boolean isOver() {
-        return crewCount >= CrewConstants.CAPACITY.value();
+        return crewCount >= CrewConstants.MAX_CREW_COUNT.value();
     }
 
     public void increment() {
@@ -50,5 +50,12 @@ public class CrewMemberCount {
             throw new GlobalException(CrewErrorCode.OVER_CREW_COUNT);
         }
         crewCount++;
+    }
+
+    public void decrement() {
+        if (crewCount <= 0) {
+            throw new GlobalException(CrewErrorCode.NOT_IN_CREW);
+        }
+        crewCount--;
     }
 }

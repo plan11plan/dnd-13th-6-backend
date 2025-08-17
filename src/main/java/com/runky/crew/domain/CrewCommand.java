@@ -7,6 +7,31 @@ public class CrewCommand {
     ) {
     }
 
+    public record Join(
+            Long userId,
+            String code
+    ) {
+    }
+
+    public record Detail(
+            Long crewId,
+            Long userId
+    ) {
+    }
+
+    public record Leave(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+    }
+
+    public record Members(
+            Long crewId,
+            Long userId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

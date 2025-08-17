@@ -1,7 +1,8 @@
 package com.runky.crew.domain;
 
 public enum CrewConstants {
-    CAPACITY(6),
+    CREW_CAPACITY(6),
+    MAX_CREW_COUNT(5),
     CODE_LENGTH(6),
     MAX_CREW_NAME_LENGTH(15),
     MAX_CREW_NOTICE_LENGTH(20);

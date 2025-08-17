@@ -36,4 +36,17 @@ class CrewMemberCountTest {
                 .usingRecursiveComparison()
                 .isEqualTo(new GlobalException(CrewErrorCode.OVER_CREW_COUNT));
     }
+
+    @Test
+    @DisplayName("속한 크루 개수가 0개인 경우, decrement 시, NOT_IN_CREW 예외가 발생한다.")
+    void throwNotInCrewException_whenDecrementFromZero() {
+        Long userId = 1L;
+        CrewMemberCount crewMemberCount = CrewMemberCount.of(userId);
+
+        GlobalException thrown = assertThrows(GlobalException.class, crewMemberCount::decrement);
+
+        assertThat(thrown)
+                .usingRecursiveComparison()
+                .isEqualTo(new GlobalException(CrewErrorCode.NOT_IN_CREW));
+    }
 }
