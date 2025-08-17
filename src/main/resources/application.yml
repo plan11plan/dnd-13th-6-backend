@@ -29,6 +29,48 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-url: ${KAKAO_REDIRECT_URL}
+
+
+runky:
+  security:
+    signup-token:
+      ttlMinutes: ${SIGNUP_TTL}
+    jwt:
+      access:
+        secret-key: ${ACCESS_SECRET_KEY}
+        expiration-minutes: ${ACCESS_EXPIRATION}
+        algorithm: ${ACCESS_ALGORITHM}
+      refresh:
+        secret-key: ${REFRESH_SECRET_KEY}
+        expiration-minutes: ${REFRESH_EXPIRATION}
+        algorithm: ${REFRESH_ALGORITHM}
+
+    refresh-token:
+      hash:
+        mode: ${REFRESH_HASH_MODE}
+        algorithm: ${REFRESH_HASH_ALGORITHM}
+        pepper: ${REFRESH_HASH_PEPPER}
+
+    cookie:
+      common:
+        path: "/"
+        domain: ~
+        http-only: true
+        secure: true
+        same-site: None
+      access:
+        name: "accessToken"
+        max-age-minutes: 1440
+      refresh:
+        name: "refreshToken"
+        max-age-minutes: 10080
+      signup:
+        name: "signupToken"
+        max-age-minutes: 10
+
 ---
 spring:
   config:
