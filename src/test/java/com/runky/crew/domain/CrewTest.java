@@ -168,8 +168,25 @@ class CrewTest {
     @Nested
     @DisplayName("크루원 추방 시,")
     class Ban {
+
         @Test
-        @DisplayName("크루원이 존재하지 않으면, NOT_FOUND 예외가 발생한다.")
+        @DisplayName("탈퇴한 크루원을 추방하려고 하면, NOT_CREW_MEMBER 예외가 발생한다.")
+        void throwNotInCrewException_whenBanningLeftMember() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.leaveMember(2L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.banMember(2L));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
+
+        @Test
+        @DisplayName("크루원이 존재하지 않으면, NOT_CREW_MEMBER 예외가 발생한다.")
         void throwNotFoundException_whenBanningNonExistentMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
@@ -179,7 +196,7 @@ class CrewTest {
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
 
         @Test
@@ -202,7 +219,23 @@ class CrewTest {
     class Leave {
 
         @Test
-        @DisplayName("크루원이 존재하지 않으면, NOT_FOUND 예외가 발생한다.")
+        @DisplayName("이미 크루에 존재하지 않으면, NOT_CREW_MEMBER 예외가 발생한다.")
+        void throwNotCrewMemberException_whenLeavingNonExistentMember() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.leaveMember(2L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.leaveMember(2L));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
+
+        @Test
+        @DisplayName("크루원이 존재하지 않으면, NOT_CREW_MEMBER 예외가 발생한다.")
         void throwNotFoundException_whenLeavingNonExistentMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
@@ -212,7 +245,7 @@ class CrewTest {
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
 
         @Test
@@ -280,6 +313,25 @@ class CrewTest {
         }
     }
 
+    @Nested
+    @DisplayName("크루 유저 수 감소 시,")
+    class Decrement {
+
+        @Test
+        @DisplayName("마지막 남은 유저는 탈퇴할 수 없다.")
+        void throwCannotLeaveLastMemberException_whenDecrementingLastMember() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, crew::decrementActiveMemberCount);
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.LAST_CREW_MEMBER));
+        }
+    }
+
     @Test
     @DisplayName("크루의 리더를 조회한다.")
     void getLeader() {
@@ -320,7 +372,7 @@ class CrewTest {
     class GetMember {
 
         @Test
-        @DisplayName("크루 내 활동중인 멤버 조회 시, 멤버가 존재하지 않다면, NOT_FOUND 예외가 발생한다.")
+        @DisplayName("크루 내 활동중인 멤버 조회 시, 멤버가 존재하지 않다면, NOT_CREW_MEMBER 예외가 발생한다.")
         void throwNotFoundException_whenGettingNonExistentMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
@@ -330,11 +382,11 @@ class CrewTest {
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
 
         @Test
-        @DisplayName("크루 내 활동중인 멤버 조회 시, 탈퇴한 멤버라면, NOT_FOUND 예외가 발생한다.")
+        @DisplayName("크루 내 활동중인 멤버 조회 시, 탈퇴한 멤버라면, NOT_CREW_MEMBER 예외가 발생한다.")
         void throwNotFoundException_whenGettingLeftMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
@@ -346,11 +398,11 @@ class CrewTest {
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
 
         @Test
-        @DisplayName("크루 내 활동중인 멤버 조회 시, 추방 멤버라면, NOT_FOUND 예외가 발생한다.")
+        @DisplayName("크루 내 활동중인 멤버 조회 시, 추방 멤버라면, NOT_CREW_MEMBER 예외가 발생한다.")
         void throwNotFoundException_whenGettingBannedMember() {
             CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
             Code code = new Code("ABC123");
@@ -362,7 +414,7 @@ class CrewTest {
 
             assertThat(thrown)
                     .usingRecursiveComparison()
-                    .isEqualTo(new GlobalException(GlobalErrorCode.NOT_FOUND));
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
         }
 
         @Test

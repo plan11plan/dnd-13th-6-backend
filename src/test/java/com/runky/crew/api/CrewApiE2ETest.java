@@ -169,6 +169,9 @@ class CrewApiE2ETest {
             Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
             crew.joinMember(2L);
             Crew savedCrew = crewRepository.save(crew);
+            CrewMemberCount crewMemberCount = CrewMemberCount.of(2L);
+            crewMemberCount.increment();
+            crewRepository.save(crewMemberCount);
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("X-USER-ID", String.valueOf(2L));

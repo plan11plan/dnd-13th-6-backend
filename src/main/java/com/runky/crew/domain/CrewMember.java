@@ -72,6 +72,12 @@ public class CrewMember extends BaseTimeEntity {
     }
 
     public void leave() {
+        if (this.role == Role.LEADER) {
+            throw new GlobalException(CrewErrorCode.HAVE_TO_DELEGATE_LEADER);
+        }
+        if (this.role == Role.BANNED || this.role == Role.LEFT) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_MEMBER);
+        }
         this.role = Role.LEFT;
     }
 

@@ -85,22 +85,14 @@ public class Crew extends BaseTimeEntity {
     }
 
     public CrewMember banMember(Long memberId) {
-        CrewMember crewMember = this.members.stream()
-                .filter(member -> member.getMemberId().equals(memberId))
-                .findFirst()
-                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
-
+        CrewMember crewMember = getMember(memberId);
         crewMember.ban();
         decrementActiveMemberCount();
         return crewMember;
     }
 
     public CrewMember leaveMember(Long memberId) {
-        CrewMember crewMember = this.members.stream()
-                .filter(member -> member.getMemberId().equals(memberId))
-                .findFirst()
-                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
-
+        CrewMember crewMember = getMember(memberId);
         crewMember.leave();
         decrementActiveMemberCount();
         return crewMember;
@@ -147,6 +139,12 @@ public class Crew extends BaseTimeEntity {
     }
 
     public void decrementActiveMemberCount() {
+        if (this.activeMemberCount == 1) {
+            throw new GlobalException(CrewErrorCode.LAST_CREW_MEMBER);
+        }
+        if (this.activeMemberCount <= 0) {
+            throw new GlobalException(GlobalErrorCode.VALID_EXCEPTION);
+        }
         this.activeMemberCount--;
     }
 
@@ -168,7 +166,7 @@ public class Crew extends BaseTimeEntity {
         return this.members.stream()
                 .filter(member -> member.getMemberId().equals(memberId) && member.isInCrew())
                 .findFirst()
-                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
     }
 
     public List<CrewMember> getActiveMembers() {

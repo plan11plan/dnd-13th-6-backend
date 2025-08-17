@@ -93,4 +93,61 @@ class CrewMemberTest {
         assertThat(isLeaderInCrew).isTrue();
         assertThat(isMemberInCrew).isTrue();
     }
+
+    @Nested
+    @DisplayName("크루 탈퇴 시,")
+    class Leave {
+
+        @Test
+        @DisplayName("리더가 탈퇴하면, HAVE_TO_DELEGATE_LEADER 예외가 발생한다.")
+        void throwHaveToDelegateLeaderException_whenLeaderLeaves() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
+            CrewMember leader = crew.getLeader();
+
+            GlobalException thrown = assertThrows(GlobalException.class, leader::leave);
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.HAVE_TO_DELEGATE_LEADER));
+        }
+
+        @Test
+        @DisplayName("추방된 크루원이 탈퇴하면, NOT_CREW_MEMBER 예외가 발생한다.")
+        void throwNotCrewMemberException_whenBannedMemberLeaves() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
+            crew.joinMember(2L);
+            CrewMember bannedMember = crew.banMember(2L);
+
+            GlobalException thrown = assertThrows(GlobalException.class, bannedMember::leave);
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
+
+        @Test
+        @DisplayName("이미 탈퇴한 크루원이 다시 탈퇴하면, NOT_CREW_MEMBER 예외가 발생한다.")
+        void throwNotCrewMemberException_whenAlreadyLeftMemberLeaves() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
+            CrewMember member = CrewMember.memberOf(2L, crew);
+            member.leave();
+
+            GlobalException thrown = assertThrows(GlobalException.class, member::leave);
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.NOT_CREW_MEMBER));
+        }
+
+        @Test
+        @DisplayName("멤버는 정상적으로 탈퇴할 수 있다.")
+        void memberCanLeaveCrew() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Test Crew"), new Code("ABC123"));
+            CrewMember member = CrewMember.memberOf(2L, crew);
+
+            member.leave();
+
+            assertThat(member.getRole()).isEqualTo(CrewMember.Role.LEFT);
+        }
+    }
 }
