@@ -82,4 +82,13 @@ public class CrewController implements CrewApiSpec {
         CrewResult result = crewFacade.updateNotice(new CrewCriteria.UpdateNotice(crewId, userId, request.notice()));
         return ApiResponse.success(new CrewResponse.Notice(result.notice()));
     }
+
+    @Override
+    @PatchMapping("/{crewId}/name")
+    public ApiResponse<CrewResponse.Name> updateName(@RequestBody CrewRequest.Name request,
+                                                     @PathVariable Long crewId,
+                                                     @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.updateName(new CrewCriteria.UpdateName(crewId, userId, request.name()));
+        return ApiResponse.success(new CrewResponse.Name(result.name()));
+    }
 }

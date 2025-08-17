@@ -105,6 +105,11 @@ public class CrewResponse {
     ) {
     }
 
+    public record Name(
+            String name
+    ) {
+    }
+
     private CrewResponse() {
     }
 }

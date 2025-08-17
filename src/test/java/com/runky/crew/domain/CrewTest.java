@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class CrewTest {
 
@@ -378,6 +380,40 @@ class CrewTest {
             assertThat(thrown)
                     .usingRecursiveComparison()
                     .isEqualTo(new GlobalException(CrewErrorCode.INVALID_NOTICE));
+        }
+    }
+
+    @Nested
+    @DisplayName("크루 이름 변경 시,")
+    class UpdateName {
+
+        @ParameterizedTest(name = "{index} - {0}")
+        @NullAndEmptySource
+        @DisplayName("변경 내용이 공백이면, BLANK_CREW_NAME 예외가 발생한다.")
+        void throwBlankCrewNameException_whenNameIsBlank(String name) {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateName(name));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.BLANK_CREW_NAME));
+        }
+
+        @Test
+        @DisplayName("변경 이름이 15자를 초과하면, OVER_CREW_NAME 예외가 발생한다.")
+        void throwOverCrewNameException_whenNameIsOver15Characters() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateName("ThisNameIsWayTooLong"));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.OVER_CREW_NAME));
         }
     }
 

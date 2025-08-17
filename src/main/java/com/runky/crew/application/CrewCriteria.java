@@ -84,6 +84,20 @@ public class CrewCriteria {
         }
     }
 
+    public record UpdateName(
+            Long crewId,
+            Long userId,
+            String notice
+    ) {
+        public CrewCommand.UpdateName toCommand() {
+            return new CrewCommand.UpdateName(
+                    crewId,
+                    userId,
+                    notice
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

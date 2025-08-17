@@ -25,6 +25,11 @@ public class CrewRequest {
     ) {
     }
 
+    public record Name(
+            String name
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

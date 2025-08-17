@@ -22,4 +22,15 @@ public class CrewLeaderService {
         crew.updateNotice(command.notice());
         return crew;
     }
+
+    @Transactional
+    public Crew updateName(CrewCommand.UpdateName command) {
+        Crew crew = crewRepository.findById(command.crewId())
+                .orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
+        if (!crew.isLeader(command.userId())) {
+            throw new GlobalException(CrewErrorCode.NOT_CREW_LEADER);
+        }
+        crew.updateName(command.name());
+        return crew;
+    }
 }

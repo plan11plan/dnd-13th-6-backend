@@ -124,6 +124,16 @@ public class Crew extends BaseTimeEntity {
         this.notice = notice;
     }
 
+    public void updateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new GlobalException(CrewErrorCode.BLANK_CREW_NAME);
+        }
+        if (name.length() > CrewConstants.MAX_CREW_NAME_LENGTH.value()) {
+            throw new GlobalException(CrewErrorCode.OVER_CREW_NAME);
+        }
+        this.name = name;
+    }
+
     public boolean hasHistory(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId));

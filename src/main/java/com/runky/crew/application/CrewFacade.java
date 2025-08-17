@@ -59,4 +59,9 @@ public class CrewFacade {
         Crew crew = crewLeaderService.updateNotice(criteria.toCommand());
         return CrewResult.from(crew);
     }
+
+    public CrewResult updateName(CrewCriteria.UpdateName criteria) {
+        Crew crew = crewLeaderService.updateName(criteria.toCommand());
+        return CrewResult.from(crew);
+    }
 }

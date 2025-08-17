@@ -39,6 +39,13 @@ public class CrewCommand {
     ) {
     }
 
+    public record UpdateName(
+            Long crewId,
+            Long userId,
+            String name
+    ) {
+    }
+
     private CrewCommand() {
     }
 }
