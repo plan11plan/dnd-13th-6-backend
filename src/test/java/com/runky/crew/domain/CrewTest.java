@@ -6,10 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class CrewTest {
 
@@ -346,6 +349,144 @@ class CrewTest {
 
         assertThat(leader.getRole()).isEqualTo(CrewMember.Role.LEADER);
         assertThat(leader.getMemberId()).isEqualTo(1L);
+    }
+
+    @Nested
+    @DisplayName("크루 해체 시,")
+    class Disband {
+
+        @Test
+        @DisplayName("모든 멤버의 상태는 LEFT로 변경된다.")
+        void changeAllMembersToLeft() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.disband();
+
+            List<CrewMember> members = crew.getMembers();
+            assertThat(members).allMatch(member -> member.getRole() == CrewMember.Role.LEFT);
+        }
+
+        @Test
+        @DisplayName("크루의 활동 멤버 수는 0이 된다.")
+        void setActiveMemberCountToZero() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+
+            crew.disband();
+
+            assertThat(crew.getActiveMemberCount()).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("deletedAt이 기록된다.")
+        void recordDeletedAt() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            ZonedDateTime before = crew.getDeletedAt();
+
+            crew.disband();
+
+            ZonedDateTime after = crew.getDeletedAt();
+            assertThat(before).isNull();
+            assertThat(after).isNotNull();
+        }
+
+        @Test
+        @DisplayName("해체 당시 크루 멤버들을 반환한다.")
+        void returnMembersOnDisband() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            crew.banMember(3L);
+            crew.joinMember(4L);
+            crew.leaveMember(4L);
+            List<CrewMember> activeMembers = crew.getActiveMembers();
+
+            List<CrewMember> disbandedMembers = crew.disband();
+
+            assertThat(disbandedMembers).hasSize(2);
+            assertThat(disbandedMembers).extracting("memberId")
+                    .containsExactlyInAnyOrder(1L, 2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("크루 공지 변경 시,")
+    class UpdateNotice {
+
+        @Test
+        @DisplayName("변경 내용이 존재하지 않다면, INVALID_NOTICE 예외가 발생한다.")
+        void throwInvalidNoticeException_whenNoticeIsNull() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateNotice(null));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.INVALID_NOTICE));
+        }
+
+        @Test
+        @DisplayName("변경 내용이 20자를 초과하면, INVALID_NOTICE 예외가 발생한다.")
+        void throwInvalidNoticeException_whenNoticeIsOver20Characters() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateNotice("This notice is way too long for the limit."));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.INVALID_NOTICE));
+        }
+    }
+
+    @Nested
+    @DisplayName("크루 이름 변경 시,")
+    class UpdateName {
+
+        @ParameterizedTest(name = "{index} - {0}")
+        @NullAndEmptySource
+        @DisplayName("변경 내용이 공백이면, BLANK_CREW_NAME 예외가 발생한다.")
+        void throwBlankCrewNameException_whenNameIsBlank(String name) {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateName(name));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.BLANK_CREW_NAME));
+        }
+
+        @Test
+        @DisplayName("변경 이름이 15자를 초과하면, OVER_CREW_NAME 예외가 발생한다.")
+        void throwOverCrewNameException_whenNameIsOver15Characters() {
+            CrewCommand.Create command = new CrewCommand.Create(1L, "ValidName");
+            Code code = new Code("ABC123");
+            Crew crew = Crew.of(command, code);
+
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crew.updateName("ThisNameIsWayTooLong"));
+
+            assertThat(thrown)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new GlobalException(CrewErrorCode.OVER_CREW_NAME));
+        }
     }
 
     @Nested

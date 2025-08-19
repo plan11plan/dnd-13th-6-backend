@@ -70,6 +70,74 @@ public class CrewCriteria {
         }
     }
 
+    public record UpdateNotice(
+            Long crewId,
+            Long userId,
+            String notice
+    ) {
+        public CrewCommand.UpdateNotice toCommand() {
+            return new CrewCommand.UpdateNotice(
+                    crewId,
+                    userId,
+                    notice
+            );
+        }
+    }
+
+    public record UpdateName(
+            Long crewId,
+            Long userId,
+            String notice
+    ) {
+        public CrewCommand.UpdateName toCommand() {
+            return new CrewCommand.UpdateName(
+                    crewId,
+                    userId,
+                    notice
+            );
+        }
+    }
+
+    public record Disband(
+            Long crewId,
+            Long userId
+    ) {
+        public CrewCommand.Disband toCommand() {
+            return new CrewCommand.Disband(
+                    crewId,
+                    userId
+            );
+        }
+    }
+
+    public record Delegate(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+        public CrewCommand.Delegate toCommand() {
+            return new CrewCommand.Delegate(
+                    crewId,
+                    userId,
+                    newLeaderId
+            );
+        }
+    }
+
+    public record Ban(
+            Long crewId,
+            Long userId,
+            Long banMemberId
+    ) {
+        public CrewCommand.Ban toCommand() {
+            return new CrewCommand.Ban(
+                    crewId,
+                    userId,
+                    banMemberId
+            );
+        }
+    }
+
     private CrewCriteria() {
     }
 }

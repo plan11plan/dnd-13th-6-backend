@@ -32,6 +32,40 @@ public class CrewCommand {
     ) {
     }
 
+    public record UpdateNotice(
+            Long crewId,
+            Long userId,
+            String notice
+    ) {
+    }
+
+    public record UpdateName(
+            Long crewId,
+            Long userId,
+            String name
+    ) {
+    }
+
+    public record Disband(
+            Long crewId,
+            Long userId
+    ) {
+    }
+
+    public record Delegate(
+            Long crewId,
+            Long userId,
+            Long newLeaderId
+    ) {
+    }
+
+    public record Ban(
+            Long crewId,
+            Long userId,
+            Long banMemberId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

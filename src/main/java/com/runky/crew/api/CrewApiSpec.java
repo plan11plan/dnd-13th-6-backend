@@ -59,4 +59,53 @@ public interface CrewApiSpec {
             @Schema(name = "크루 ID", description = "멤버를 조회할 크루 ID") Long crewId,
             Long userId
     );
+
+    @Operation(
+            summary = "크루 공지사항 수정",
+            description = "크루의 공지사항을 수정합니다."
+    )
+    ApiResponse<CrewResponse.Notice> updateNotice(
+            @Schema(name = "크루 공지사항 수정 요청", description = "크루 공지사항 수정에 필요한 정보") CrewRequest.Notice request,
+            @Schema(name = "크루 ID", description = "공지사항을 수정할 크루 ID") Long crewId,
+            Long userId
+    );
+
+    @Operation(
+            summary = "크루 이름 수정",
+            description = "크루의 이름을 수정합니다."
+    )
+    ApiResponse<CrewResponse.Name> updateName(
+            @Schema(name = "크루 이름 수정 요청", description = "크루 이름 수정에 필요한 정보") CrewRequest.Name request,
+            @Schema(name = "크루 ID", description = "이름을 수정할 크루 ID") Long crewId,
+            Long userId
+    );
+
+    @Operation(
+            summary = "크루 해체",
+            description = "크루를 해체합니다."
+    )
+    ApiResponse<CrewResponse.Disband> disbandCrew(
+            @Schema(name = "크루 ID", description = "해체할 크루 ID") Long crewId,
+            Long userId
+    );
+
+    @Operation(
+            summary = "크루 리더 위임",
+            description = "크루의 리더를 다른 멤버로 위임합니다."
+    )
+    ApiResponse<CrewResponse.Delegate> delegateLeader(
+            @Schema(name = "크루 리더 위임 요청", description = "새 리더의 ID") CrewRequest.Delegate request,
+            @Schema(name = "크루 ID", description = "리더를 위임할 크루 ID") Long crewId,
+            Long userId
+    );
+
+    @Operation(
+            summary = "크루원 추방",
+            description = "크루에서 특정 멤버를 추방합니다."
+    )
+    ApiResponse<CrewResponse.Ban> banMember(
+            @Schema(name = "크루 ID", description = "멤버를 추방할 크루 ID") Long crewId,
+            @Schema(name = "추방할 사용자 ID", description = "추방할 멤버의 ID") Long targetId,
+            Long userId
+    );
 }

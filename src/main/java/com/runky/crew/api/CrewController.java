@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,5 +72,50 @@ public class CrewController implements CrewApiSpec {
                 .map(CrewResponse.Member::from)
                 .toList();
         return ApiResponse.success(new CrewResponse.Members(members));
+    }
+
+    @Override
+    @PatchMapping("/{crewId}/notice")
+    public ApiResponse<CrewResponse.Notice> updateNotice(@RequestBody CrewRequest.Notice request,
+                                                         @PathVariable Long crewId,
+                                                         @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.updateNotice(new CrewCriteria.UpdateNotice(crewId, userId, request.notice()));
+        return ApiResponse.success(new CrewResponse.Notice(result.notice()));
+    }
+
+    @Override
+    @PatchMapping("/{crewId}/name")
+    public ApiResponse<CrewResponse.Name> updateName(@RequestBody CrewRequest.Name request,
+                                                     @PathVariable Long crewId,
+                                                     @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.updateName(new CrewCriteria.UpdateName(crewId, userId, request.name()));
+        return ApiResponse.success(new CrewResponse.Name(result.name()));
+    }
+
+    @Override
+    @DeleteMapping("/{crewId}")
+    public ApiResponse<CrewResponse.Disband> disbandCrew(@PathVariable Long crewId,
+                                                         @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult result = crewFacade.disband(new CrewCriteria.Disband(crewId, userId));
+        return ApiResponse.success(new CrewResponse.Disband(result.name()));
+    }
+
+    @Override
+    @PatchMapping("/{crewId}/leader")
+    public ApiResponse<CrewResponse.Delegate> delegateLeader(@RequestBody CrewRequest.Delegate request,
+                                                             @PathVariable Long crewId,
+                                                             @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Delegate result = crewFacade.delegateLeader(
+                new CrewCriteria.Delegate(crewId, userId, request.newLeaderId()));
+        return ApiResponse.success(new CrewResponse.Delegate(result.leaderId(), result.leaderNickname()));
+    }
+
+    @Override
+    @DeleteMapping("/{crewId}/members/{memberId}")
+    public ApiResponse<CrewResponse.Ban> banMember(@PathVariable("crewId") Long crewId,
+                                                   @PathVariable("memberId") Long targetId,
+                                                   @RequestHeader("X-USER-ID") Long userId) {
+        CrewResult.Ban result = crewFacade.banMember(new CrewCriteria.Ban(crewId, userId, targetId));
+        return ApiResponse.success(new CrewResponse.Ban(result.targetId(), result.nickname()));
     }
 }

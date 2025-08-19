@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CrewFacade {
     private final CrewService crewService;
+    private final CrewLeaderService crewLeaderService;
 
     public CrewResult create(CrewCriteria.Create criteria) {
         Crew crew = crewService.create(criteria.toCommand());
@@ -51,5 +53,38 @@ public class CrewFacade {
     public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {
         Crew crew = crewService.leave(criteria.toCommand());
         return new CrewResult.Leave(crew.getId(), crew.getName());
+    }
+
+    public CrewResult updateNotice(CrewCriteria.UpdateNotice criteria) {
+        Crew crew = crewLeaderService.updateNotice(criteria.toCommand());
+        return CrewResult.from(crew);
+    }
+
+    public CrewResult updateName(CrewCriteria.UpdateName criteria) {
+        Crew crew = crewLeaderService.updateName(criteria.toCommand());
+        return CrewResult.from(crew);
+    }
+
+    public CrewResult disband(CrewCriteria.Disband criteria) {
+        Crew crew = crewLeaderService.disband(criteria.toCommand());
+        return CrewResult.from(crew);
+    }
+
+    public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
+        Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
+
+        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
+        String leaderNickname = "Leader Nickname";
+
+        return new CrewResult.Delegate(crew.getLeaderId(), leaderNickname);
+    }
+
+    public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
+        CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
+
+        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
+        String bannedNickname = "Banned Nickname";
+
+        return new CrewResult.Ban(bannedMember.getMemberId(), bannedNickname);
     }
 }

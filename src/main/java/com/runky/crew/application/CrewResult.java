@@ -55,4 +55,16 @@ public record CrewResult(
             String name
     ) {
     }
+
+    public record Delegate(
+            Long leaderId,
+            String leaderNickname
+    ) {
+    }
+
+    public record Ban(
+            Long targetId,
+            String nickname
+    ) {
+    }
 }

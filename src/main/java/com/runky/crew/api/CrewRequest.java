@@ -20,6 +20,21 @@ public class CrewRequest {
     ) {
     }
 
+    public record Notice(
+            String notice
+    ) {
+    }
+
+    public record Name(
+            String name
+    ) {
+    }
+
+    public record Delegate(
+            Long newLeaderId
+    ) {
+    }
+
     private CrewRequest() {
     }
 }

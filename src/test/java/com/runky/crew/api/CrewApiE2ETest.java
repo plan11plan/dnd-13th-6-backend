@@ -219,4 +219,154 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().members()).hasSize(3);
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/crews/{crewId}/notice")
+    class UpdateNotice {
+        final String BASE_URL = "/api/crews/{crewId}/notice";
+
+        @Test
+        @DisplayName("크루의 공지사항을 업데이트한다.")
+        void updateNotice() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Notice>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            CrewRequest.Notice request = new CrewRequest.Notice("New Notice");
+            ResponseEntity<ApiResponse<CrewResponse.Notice>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
+                            responseType, savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().notice()).isEqualTo("New Notice");
+        }
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/crews/{crewId}/name")
+    class UpdateCrewName {
+        final String BASE_URL = "/api/crews/{crewId}/name";
+
+        @Test
+        @DisplayName("크루의 이름을 업데이트한다.")
+        void updateCrewName() {
+            long userId = 1L;
+            crewRepository.save(CrewMemberCount.of(userId));
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Old Crew Name"), new Code("abc123"));
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Name>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            CrewRequest.Name request = new CrewRequest.Name("New Crew Name");
+            ResponseEntity<ApiResponse<CrewResponse.Name>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
+                            responseType, savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().name()).isEqualTo("New Crew Name");
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /api/crews/{crewId}")
+    class DeleteCrew {
+        final String BASE_URL = "/api/crews/{crewId}";
+
+        @Test
+        @DisplayName("크루를 삭제한다.")
+        void deleteCrew() {
+            long userId = 1L;
+            CrewMemberCount count1 = CrewMemberCount.of(1L);
+            count1.increment();
+            CrewMemberCount count2 = CrewMemberCount.of(2L);
+            count2.increment();
+            crewRepository.save(count1);
+            crewRepository.save(count2);
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Disband>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Disband>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders), responseType,
+                            savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().name()).isEqualTo(savedCrew.getName());
+        }
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/crews/{crewId}/leader")
+    class UpdateLeader {
+        final String BASE_URL = "/api/crews/{crewId}/leader";
+
+        @Test
+        @DisplayName("크루의 리더를 변경한다.")
+        void updateLeader() {
+            long userId = 1L;
+            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(userId));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Delegate>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            CrewRequest.Delegate request = new CrewRequest.Delegate(2L);
+            ResponseEntity<ApiResponse<CrewResponse.Delegate>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
+                            responseType, savedCrew.getId());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().leaderId()).isEqualTo(2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /api/crews/{crewId}/members/{memberId}")
+    class BanMember {
+        final String BASE_URL = "/api/crews/{crewId}/members/{memberId}";
+
+        @Test
+        @DisplayName("크루에서 멤버를 추방한다.")
+        void banMember() {
+            long userId = 1L;
+            CrewMemberCount count1 = CrewMemberCount.of(1L);
+            count1.increment();
+            CrewMemberCount count2 = CrewMemberCount.of(2L);
+            count2.increment();
+            crewRepository.save(count1);
+            crewRepository.save(count2);
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("abc123"));
+            crew.joinMember(2L);
+            Crew savedCrew = crewRepository.save(crew);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("X-USER-ID", String.valueOf(1L));
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Ban>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CrewResponse.Ban>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders), responseType,
+                            savedCrew.getId(), 2L);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getResult().targetId()).isEqualTo(2L);
+        }
+    }
 }

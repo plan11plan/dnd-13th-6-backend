@@ -117,6 +117,35 @@ public class Crew extends BaseTimeEntity {
         this.leaderId = newLeaderId;
     }
 
+    public List<CrewMember> disband() {
+        CrewMember leader = getLeader();
+        leader.demote();
+        List<CrewMember> activeMembers = getActiveMembers();
+        for (CrewMember member : activeMembers) {
+            member.leave();
+        }
+        this.activeMemberCount = 0L;
+        delete();
+        return activeMembers;
+    }
+
+    public void updateNotice(String notice) {
+        if (notice == null || notice.length() > CrewConstants.MAX_CREW_NOTICE_LENGTH.value()) {
+            throw new GlobalException(CrewErrorCode.INVALID_NOTICE);
+        }
+        this.notice = notice;
+    }
+
+    public void updateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new GlobalException(CrewErrorCode.BLANK_CREW_NAME);
+        }
+        if (name.length() > CrewConstants.MAX_CREW_NAME_LENGTH.value()) {
+            throw new GlobalException(CrewErrorCode.OVER_CREW_NAME);
+        }
+        this.name = name;
+    }
+
     public boolean hasHistory(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId));
@@ -129,6 +158,10 @@ public class Crew extends BaseTimeEntity {
     public boolean containsMember(Long memberId) {
         return this.members.stream()
                 .anyMatch(member -> member.getMemberId().equals(memberId) && member.isInCrew());
+    }
+
+    public boolean isLeader(Long memberId) {
+        return this.leaderId.equals(memberId);
     }
 
     public void incrementActiveMemberCount() {

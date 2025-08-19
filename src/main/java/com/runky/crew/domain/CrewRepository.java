@@ -2,6 +2,7 @@ package com.runky.crew.domain;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CrewRepository {
 
@@ -20,4 +21,6 @@ public interface CrewRepository {
     Crew save(Crew crew);
 
     CrewMemberCount save(CrewMemberCount crewMemberCount);
+
+    List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds);
 }
