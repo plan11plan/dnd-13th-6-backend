@@ -137,9 +137,9 @@ class CrewLeaderServiceTest {
             crew.banMember(4L);
             CrewMemberCount memberCount1 = CrewMemberCount.of(1L);
             memberCount1.increment();
-            CrewMemberCount memberCount2 = CrewMemberCount.of(1L);
+            CrewMemberCount memberCount2 = CrewMemberCount.of(2L);
             memberCount2.increment();
-            CrewMemberCount memberCount3 = CrewMemberCount.of(1L);
+            CrewMemberCount memberCount3 = CrewMemberCount.of(3L);
             memberCount3.increment();
             given(crewRepository.findById(crew.getId()))
                     .willReturn(Optional.of(crew));
