@@ -17,10 +17,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/runnings")
 @RequiredArgsConstructor
-public class RunningController {
+public class RunningController implements RunningApiSpec {
 
 	private final RunningFacade runningFacade;
 
+	@Override
 	@PostMapping("/start")
 	public ApiResponse<RunningResponse.Start> start(@RequestHeader("X-USER-ID") Long userId) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(userId));
@@ -31,6 +32,7 @@ public class RunningController {
 		return ApiResponse.success(response);
 	}
 
+	@Override
 	@PostMapping("/{runningId}/end")
 	public ApiResponse<RunningResponse.End> end(@RequestHeader("X-USER-ID") Long userId, @PathVariable Long runningId,
 		@RequestBody RunningRequest.End request) {

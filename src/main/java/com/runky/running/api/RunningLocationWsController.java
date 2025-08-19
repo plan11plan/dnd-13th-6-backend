@@ -7,7 +7,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class RunningLocationWsController {
+public class RunningLocationWsController implements RunningLocationWsApiSpec {
 
 	@MessageMapping("/runnings/{runningId}/location")
 	@SendTo("/topic/runnings/{runningId}")
