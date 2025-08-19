@@ -235,11 +235,11 @@ class CrewApiE2ETest {
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("X-USER-ID", String.valueOf(userId));
-            ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Notice>> responseType = new ParameterizedTypeReference<>() {
             };
 
             CrewRequest.Notice request = new CrewRequest.Notice("New Notice");
-            ResponseEntity<ApiResponse<CrewResponse.Detail>> response =
+            ResponseEntity<ApiResponse<CrewResponse.Notice>> response =
                     testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
                             responseType, savedCrew.getId());
 
@@ -263,11 +263,11 @@ class CrewApiE2ETest {
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("X-USER-ID", String.valueOf(userId));
-            ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<CrewResponse.Name>> responseType = new ParameterizedTypeReference<>() {
             };
 
             CrewRequest.Name request = new CrewRequest.Name("New Crew Name");
-            ResponseEntity<ApiResponse<CrewResponse.Detail>> response =
+            ResponseEntity<ApiResponse<CrewResponse.Name>> response =
                     testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
                             responseType, savedCrew.getId());
 
