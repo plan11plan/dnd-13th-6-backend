@@ -71,7 +71,7 @@ jobs:
           host: ${{secrets.EC2_HOST}}
           username: ${{secrets.EC2_USERNAME}}
           key: ${{secrets.EC2_KEY}}
-          source: "docker/.env"
+          source: ".env"
           target: "./docker"
 
       - name: Docker Compose 파일 업로드
@@ -80,7 +80,7 @@ jobs:
           host: ${{secrets.EC2_HOST}}
           username: ${{secrets.EC2_USERNAME}}
           key: ${{secrets.EC2_KEY}}
-          source: "docker/server-compose.yml"
+          source: "server-compose.yml"
           target: "./docker"
 
       - name: Docker Compose 실행
