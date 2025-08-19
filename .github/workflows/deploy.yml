@@ -39,10 +39,9 @@ jobs:
       - name: .env 파일 생성
         run: |
           mkdir -p ./docker
-          echo "SPRING_PROFILES_ACTIVE=prod" > ./docker/.env
+          echo "SPRING_PROFILES_ACTIVE=prod" >> ./docker/.env
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_HUB_NAME }}" >> ./docker/.env
-          echo "MYSQL_HOST=${{ secrets.MYSQL_HOST }}" >> ./docker/.env
-          echo "MYSQL_PORT=${{ secrets.MYSQL_PORT }}" >> ./docker/.env
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> ./docker/.env
           echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> ./docker/.env
           echo "MYSQL_PWD=${{ secrets.MYSQL_PWD }}" >> ./docker/.env
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> ./docker/.env
@@ -92,4 +91,4 @@ jobs:
           script: |
             docker login -u ${{secrets.DOCKER_HUB_NAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
             docker compose -f ./docker/server-compose.yml pull
-            docker compose -f ./docker/server-compose.yml up
+            docker compose -f ./docker/server-compose.yml up -d

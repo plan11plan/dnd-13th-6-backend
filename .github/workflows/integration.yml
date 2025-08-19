@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # DB 환경변수
-      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
-      MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+      MYSQL_URL: ${{ secrets.MYSQL_URL }}
       MYSQL_USER: ${{ secrets.MYSQL_USER }}
       MYSQL_PWD: ${{ secrets.MYSQL_PWD }}
 
