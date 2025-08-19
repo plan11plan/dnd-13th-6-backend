@@ -4,18 +4,14 @@ import com.runky.running.application.RunningCriteria;
 
 public sealed interface RunningRequest {
 
-	record Start(Long runnerId) implements RunningRequest {
-	}
-
 	record End(
-		Long runnerId,
 		Summary summary,
 		Track track
 	) implements RunningRequest {
-		RunningCriteria.End toCriteria(Long runningId) {
+		RunningCriteria.End toCriteria(Long runnerId, Long runningId) {
 			return new RunningCriteria.End(
-				runningId,
 				runnerId,
+				runningId,
 				summary.totalDistanceM,
 				summary.durationS,
 				summary.avgSpeedMPS,

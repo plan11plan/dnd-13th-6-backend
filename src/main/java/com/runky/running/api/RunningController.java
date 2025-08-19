@@ -3,6 +3,7 @@ package com.runky.running.api;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +22,8 @@ public class RunningController {
 	private final RunningFacade runningFacade;
 
 	@PostMapping("/start")
-	public ApiResponse<RunningResponse.Start> start(@RequestBody RunningRequest.Start req) {
-		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(req.runnerId()));
+	public ApiResponse<RunningResponse.Start> start(@RequestHeader("X-USER-ID") Long userId) {
+		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(userId));
 
 		String publish = "/app/runnings/" + result.runningId() + "/location";
 
@@ -31,8 +32,9 @@ public class RunningController {
 	}
 
 	@PostMapping("/{runningId}/end")
-	public ApiResponse<RunningResponse.End> end(@PathVariable Long runningId, @RequestBody RunningRequest.End request) {
-		RunningCriteria.End criteria = request.toCriteria(runningId);
+	public ApiResponse<RunningResponse.End> end(@RequestHeader("X-USER-ID") Long userId, @PathVariable Long runningId,
+		@RequestBody RunningRequest.End request) {
+		RunningCriteria.End criteria = request.toCriteria(userId, runningId);
 		RunningResult.End result = runningFacade.end(criteria);
 
 		RunningResponse.End response = RunningResponse.End.from(result);
