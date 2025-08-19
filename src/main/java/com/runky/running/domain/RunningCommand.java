@@ -9,8 +9,8 @@ public sealed interface RunningCommand {
 	record End(
 		Long runningId,
 		Long runnerId,
-		Double totalDistanceM,
-		Long durationS,
+		Double totalDistanceMinutes,
+		Long durationSeconds,
 		Double avgSpeedMPS,
 		String format,
 		String points,

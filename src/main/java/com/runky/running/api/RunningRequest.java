@@ -12,8 +12,8 @@ public sealed interface RunningRequest {
 			return new RunningCriteria.End(
 				runnerId,
 				runningId,
-				summary.totalDistanceM,
-				summary.durationS,
+				summary.totalDistanceMinutes,
+				summary.durationSeconds,
 				summary.avgSpeedMPS,
 				track.format,
 				track.points,
@@ -22,8 +22,8 @@ public sealed interface RunningRequest {
 		}
 
 		record Summary(
-			Double totalDistanceM,
-			Long durationS,
+			Double totalDistanceMinutes,
+			Long durationSeconds,
 			Double avgSpeedMPS
 		) {
 		}

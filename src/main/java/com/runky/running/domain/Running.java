@@ -43,12 +43,11 @@ public class Running {
 	@Column(name = "ended_at", nullable = true)
 	private LocalDateTime endedAt;
 
-	// 요약치(종료 시 세팅)
-	@Column(name = "total_distance_m")
-	private Double totalDistanceM;
+	@Column(name = "total_distance_minutes")
+	private Double totalDistanceMinutes;
 
-	@Column(name = "duration_ms")
-	private Long durationS;
+	@Column(name = "duration_seconds")
+	private Long durationSeconds;
 
 	@Column(name = "avg_speed_mps")
 	private Double avgSpeedMPS;
@@ -65,14 +64,14 @@ public class Running {
 		return this.status == Status.RUNNING && this.endedAt == null;
 	}
 
-	public void finish(double totalDistanceM, long durationS, Double avgSpeedMps) {
+	public void finish(double totalDistanceMinutes, long durationSeconds, Double avgSpeedMps) {
 		if (this.status != Status.RUNNING) {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
 		this.endedAt = LocalDateTime.now();
 		this.status = Status.FINISHED;
-		this.totalDistanceM = totalDistanceM;
-		this.durationS = durationS;
+		this.totalDistanceMinutes = totalDistanceMinutes;
+		this.durationSeconds = durationSeconds;
 		this.avgSpeedMPS = avgSpeedMps;
 	}
 

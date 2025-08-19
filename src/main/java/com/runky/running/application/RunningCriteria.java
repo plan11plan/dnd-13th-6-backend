@@ -15,8 +15,8 @@ public sealed interface RunningCriteria {
 	record End(
 		Long runningId,
 		Long runnerId,
-		Double totalDistanceM,
-		Long durationS,
+		Double totalDistanceMinutes,
+		Long durationSeconds,
 		Double avgSpeedMPS,
 		String format,
 		String points,
@@ -25,7 +25,7 @@ public sealed interface RunningCriteria {
 	) implements RunningCriteria {
 		RunningCommand.End toCommand() {
 			return new RunningCommand.End(
-				runningId, runnerId, totalDistanceM, durationS, avgSpeedMPS, format, points, pointCount
+				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
 			);
 		}
 	}

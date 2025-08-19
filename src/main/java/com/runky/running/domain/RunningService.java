@@ -38,7 +38,7 @@ public class RunningService {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
 
-		running.finish(command.totalDistanceM(), command.durationS(), command.avgSpeedMPS());
+		running.finish(command.totalDistanceMinutes(), command.durationSeconds(), command.avgSpeedMPS());
 		runningRepository.save(running);
 
 		if (trackRepository.existsByRunningId(command.runningId())) {
