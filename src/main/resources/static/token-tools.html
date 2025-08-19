@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Runky | 토큰 리프레시 & 로그아웃 테스트</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Arial;
+            margin: 40px;
+        }
+
+        .box {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .row {
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 0;
+            cursor: pointer;
+            font-size: 15px;
+            background: black;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .btn.secondary {
+            background: #444;
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #f6f8fa;
+            padding: 12px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        small {
+            color: #666;
+        }
+
+        code {
+            background: #f6f8fa;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>토큰 리프레시 & 로그아웃 테스트</h1>
+
+    <div class="row">
+        <label for="backendBaseUrl">백엔드 베이스 URL</label>
+        <input id="backendBaseUrl" placeholder="예: http://localhost:8080" type="text"/>
+        <small>
+            기본값은 <code>window.location.origin</code> 입니다. 프런트/백엔드가 다른 도메인이면 CORS와 쿠키 옵션(SameSite, Domain, Secure)을 맞춰야
+            합니다.
+        </small>
+    </div>
+
+    <div class="row">
+        <button class="btn" id="btnRefresh">/api/auth/token/refresh 호출</button>
+        <button class="btn secondary" id="btnLogout">/api/auth/logout 호출</button>
+    </div>
+
+    <div class="row grid">
+        <div>
+            <h3>요청 결과</h3>
+            <pre id="resp">(아직 호출 전)</pre>
+        </div>
+        <div>
+            <h3>현재 브라우저에서 보이는 쿠키</h3>
+            <pre id="cookies">(로드 중)</pre>
+            <small>
+                HttpOnly 쿠키는 보이지 않는 것이 정상입니다(예: <code>accessToken</code>, <code>refreshToken</code>).<br/>
+                서버가 <code>Set-Cookie</code>로 설정하면 네트워크 탭에서 확인하세요.
+            </small>
+        </div>
+    </div>
+
+    <div class="row">
+        <h3>참고</h3>
+        <ul>
+            <li>리프레시는 <code>refreshToken</code> 쿠키로 인증하며, 성공 시 새로운 액세스/리프레시 쿠키를 다시 내려줍니다.</li>
+            <li>로그아웃은 서버에서 RT 무효화 후, <code>accessToken</code>, <code>refreshToken</code>, <code>signupToken</code> 쿠키를
+                삭제하도록 응답합니다.
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function getBaseUrl() {
+        const v = (document.getElementById("backendBaseUrl").value || window.location.origin).trim();
+        return v.replace(/\/+$/, "");
+    }
+
+    function snapshotCookies() {
+        // 주의: HttpOnly 쿠키는 여기서 보이지 않습니다.
+        const raw = document.cookie || "(표시 가능한 쿠키 없음)";
+        document.getElementById("cookies").textContent = raw;
+    }
+
+    async function postJson(url, body = undefined) {
+        const res = await fetch(url, {
+            method: "POST",
+            credentials: "include", // 쿠키 포함
+            headers: {"Content-Type": "application/json"},
+            body: body ? JSON.stringify(body) : null
+        });
+        const contentType = res.headers.get("content-type") || "";
+        const text = await res.text();
+        return {
+            ok: res.ok,
+            status: res.status,
+            contentType,
+            bodyText: text
+        };
+    }
+
+    async function callRefresh() {
+        const url = getBaseUrl() + "/api/auth/token/refresh";
+        setResp(`POST ${url}\n\n요청 중...`);
+        try {
+            const result = await postJson(url);
+            setResp(renderResult("REFRESH", result));
+        } catch (e) {
+            setResp("요청 오류: " + (e?.message || e));
+        } finally {
+            // 서버가 쿠키를 갱신했을 수 있으나 HttpOnly면 보이지 않습니다.
+            snapshotCookies();
+        }
+    }
+
+    async function callLogout() {
+        const url = getBaseUrl() + "/api/auth/logout";
+        setResp(`POST ${url}\n\n요청 중...`);
+        try {
+            const result = await postJson(url);
+            setResp(renderResult("LOGOUT", result));
+        } catch (e) {
+            setResp("요청 오류: " + (e?.message || e));
+        } finally {
+            // 서버가 삭제 쿠키를 내려줬다면, 브라우저 적용은 네트워크 탭에서 확인 권장
+            snapshotCookies();
+        }
+    }
+
+    function setResp(text) {
+        document.getElementById("resp").textContent = text;
+    }
+
+    function renderResult(tag, {ok, status, contentType, bodyText}) {
+        const ts = new Date().toISOString();
+        return [
+            `[${tag}] @ ${ts}`,
+            `HTTP ${status} ${ok ? "(성공)" : "(실패)"}`,
+            `Content-Type: ${contentType || "(없음)"}`,
+            "",
+            bodyText || "(empty)"
+        ].join("\n");
+    }
+
+    // 초기화
+    document.getElementById("btnRefresh").addEventListener("click", callRefresh);
+    document.getElementById("btnLogout").addEventListener("click", callLogout);
+    snapshotCookies();
+</script>
+</body>
+</html>
