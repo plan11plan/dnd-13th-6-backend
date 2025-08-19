@@ -127,13 +127,13 @@ public class CrewCriteria {
     public record Ban(
             Long crewId,
             Long userId,
-            Long targetUserId
+            Long banMemberId
     ) {
         public CrewCommand.Ban toCommand() {
             return new CrewCommand.Ban(
                     crewId,
                     userId,
-                    targetUserId
+                    banMemberId
             );
         }
     }

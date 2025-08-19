@@ -35,11 +35,6 @@ public class CrewRequest {
     ) {
     }
 
-    public record Ban(
-            Long targetId
-    ) {
-    }
-
     private CrewRequest() {
     }
 }
