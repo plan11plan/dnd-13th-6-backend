@@ -59,6 +59,6 @@ jobs:
         shell: bash
 
       - name: Gradle 테스트
-        run: ./gradlew clean build test -i --stacktrace
+        run: ./gradlew clean build test
         env:
           SPRING_PROFILES_ACTIVE: prod
