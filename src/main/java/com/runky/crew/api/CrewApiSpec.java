@@ -104,8 +104,8 @@ public interface CrewApiSpec {
             description = "크루에서 특정 멤버를 추방합니다."
     )
     ApiResponse<CrewResponse.Ban> banMember(
-            @Schema(name = "추방할 사용자 ID", description = "추방할 멤버의 ID") Long targetId,
             @Schema(name = "크루 ID", description = "멤버를 추방할 크루 ID") Long crewId,
+            @Schema(name = "추방할 사용자 ID", description = "추방할 멤버의 ID") Long targetId,
             Long userId
     );
 }
