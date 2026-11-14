@@ -29,7 +29,7 @@ jobs:
       REFRESH_HASH_ALGORITHM: ${{ secrets.REFRESH_HASH_ALGORITHM }}
       REFRESH_HASH_MODE: ${{ secrets.REFRESH_HASH_MODE }}
       REFRESH_TOKEN_PEPPER: ${{ secrets.REFRESH_TOKEN_PEPPER }}
-      SIGNUP_TTL : ${{ secrets.SIGNUP_TTL }}
+      SIGNUP_TTL: ${{ secrets.SIGNUP_TTL }}
 
 
     steps:

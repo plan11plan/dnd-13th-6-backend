@@ -9,6 +9,9 @@ plugins {
 group = 'com.runky'
 version = '0.0.1-SNAPSHOT'
 
+// Testcontainers 1.21.3(Boot 3.5.4 기본)은 최신 Docker Engine(GitHub Actions 러너)에서 Docker 환경을 찾지 못함 → 1.21.4로 올림
+ext['testcontainers.version'] = '1.21.4'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
